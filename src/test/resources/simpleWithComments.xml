@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- this is a test comment -->
+<testsuite failures="1" time="0.068" errors="2" skipped="4" tests="8" name="com.google.errorprone.matchers.ConstructorOfClassTest">
+  <!-- this is a test comment -->
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <!-- this is a test comment -->
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <!-- this is a test comment -->
+  <testcase time="0.017" classname="com.google.errorprone.matchers.ConstructorOfClassTest" name="shouldMatchSingleConstructor"/>
+  <!-- this is a test comment -->
+</testsuite>
+<!-- this is a test comment -->

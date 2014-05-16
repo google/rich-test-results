@@ -23,7 +23,7 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>2.5.0</version>
+      <version>2.4.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -53,7 +53,8 @@
         <groupId>com.google.protobuf.tools</groupId>
         <artifactId>maven-protoc-plugin</artifactId>
         <configuration>
-          <protocExecutable>/usr/local/bin/protoc</protocExecutable>
+          <protocExecutable>/usr/bin/protoc</protocExecutable>
+          <!--<protocExecutable>/usr/local/bin/protoc</protocExecutable>-->
         </configuration>
         <executions>
           <execution>

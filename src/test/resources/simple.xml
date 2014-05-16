@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="1" time="0.068" errors="2" skipped="4" tests="8" name="com.google.errorprone.matchers.ConstructorOfClassTest">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase time="0.017" classname="com.google.errorprone.matchers.ConstructorOfClassTest" name="shouldMatchSingleConstructor"/>
+</testsuite>

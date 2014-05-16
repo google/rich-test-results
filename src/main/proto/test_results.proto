@@ -1,0 +1,10 @@
+// Top-level data structure representing all the outputs from one execution of the build/test tool
+option java_package = "com.google.testing";
+option java_outer_classname = "TestResultsProto";
+import "test_suite.proto";
+
+message TestResults {
+    // URI suggesting where we can find the build log served.
+    optional string build_log = 1;
+    repeated TestSuite test_suite = 2;
+}

@@ -1,0 +1,33 @@
+option java_package = "com.google.testing";
+option java_outer_classname = "TestSuiteProto";
+
+// In Ant's junit task XML format, this message represents the node
+// <testsuite failures="0" time="0.068" errors="0" skipped="0" tests="4"
+//            name="com.google.errorprone.matchers.ConstructorOfClassTest">
+message TestSuite {
+    optional string name = 1;
+    optional int64 elapsed_time_millis = 2;
+    optional int32 total_count = 6;
+    optional int32 failure_count = 3;
+    optional int32 error_count = 4;
+    optional int32 skipped_count = 5;
+
+    repeated Property property = 7;
+    repeated TestCase test_case = 8;
+}
+
+// In Ant's junit task XML format, this message represents the node
+// <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+message Property {
+    optional string name = 1;
+    optional string value = 2;
+}
+
+// In Ant's junit task XML format, this message represents the node
+// <testcase time="0.017" classname="com.google.errorprone.matchers.ConstructorOfClassTest"
+//           name="shouldMatchSingleConstructor"/>
+message TestCase {
+    optional string class_name = 1;
+    optional string name = 2;
+    optional int64 elapsed_time_millis = 3;
+}

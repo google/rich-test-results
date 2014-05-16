@@ -7,6 +7,13 @@
   <groupId>com.google.testing</groupId>
   <artifactId>results</artifactId>
   <version>1.0-SNAPSHOT</version>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>dtrott</id>
+      <url>http://maven.davidtrott.com/repository</url>
+    </pluginRepository>
+  </pluginRepositories>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>

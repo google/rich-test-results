@@ -27,7 +27,7 @@ public class AntXmlParser {
         if (next == XMLStreamConstants.END_DOCUMENT) {
           break;
         }
-        if (xmlStreamReader.isCharacters()) {
+        if (!xmlStreamReader.hasName()) {
           continue;
         }
         switch (xmlStreamReader.getName().toString()) {
@@ -72,7 +72,7 @@ public class AntXmlParser {
     String tagName = null;
     do {
       xmlStreamReader.next();
-      if (xmlStreamReader.isCharacters()) {
+      if (!xmlStreamReader.hasName()) {
         continue;
       }
       tagName = xmlStreamReader.getName().toString();
@@ -94,7 +94,7 @@ public class AntXmlParser {
     String tagName = null;
     do {
       xmlStreamReader.next();
-      if (xmlStreamReader.isCharacters()) {
+      if (!xmlStreamReader.hasName()) {
         continue;
       }
       tagName = xmlStreamReader.getName().toString();
@@ -115,6 +115,8 @@ public class AntXmlParser {
             }
             break;
         }
+      } else if (xmlStreamReader.isEndElement() && "properties".equals(tagName)) {
+        break;
       }
     } while (!xmlStreamReader.isEndElement() || !"properties".equals(tagName));
   }

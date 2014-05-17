@@ -115,6 +115,8 @@ public class AntXmlParser {
             }
             break;
         }
+      } else if (xmlStreamReader.isEndElement() && "properties".equals(tagName)) {
+        break;
       }
     } while (!xmlStreamReader.isEndElement() || !"properties".equals(tagName));
   }

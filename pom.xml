@@ -10,8 +10,8 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>dtrott</id>
-      <url>http://maven.davidtrott.com/repository</url>
+      <id>protoc-plugin</id>
+      <url>http://sergei-ivanov.github.com/maven-protoc-plugin/repo/releases/</url>
     </pluginRepository>
   </pluginRepositories>
   <dependencies>
@@ -41,20 +41,30 @@
   <build>
     <plugins>
       <plugin>
-        <!--
-        Required in settings.xml:
-        <pluginRepositories>
-                <pluginRepository>
-                    <id>dtrott</id>
-                    <url>http://maven.davidtrott.com/repository</url>
-                </pluginRepository>
-            </pluginRepositories>
-        -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-toolchains-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>toolchain</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <toolchains>
+            <protobuf>
+              <!-- http://sergei-ivanov.github.io/maven-protoc-plugin/examples/protobuf-toolchain.html -->
+              <version>[2.4,]</version>
+            </protobuf>
+          </toolchains>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>com.google.protobuf.tools</groupId>
         <artifactId>maven-protoc-plugin</artifactId>
-        <configuration>
-          <protocExecutable>/usr/local/bin/protoc</protocExecutable>
-        </configuration>
+        <extensions>true</extensions>
         <executions>
           <execution>
             <goals>
@@ -64,7 +74,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>

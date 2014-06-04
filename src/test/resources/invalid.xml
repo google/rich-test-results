@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="0.007" errors="1" skipped="0" tests="1" name="com.google.ExceptionThrownTest">
+  <testcase time="0.007" classname="com.google.ExceptionThrownTest" name="testDivision">
+    <error message="/ by zero" type="java.lang.ArithmeticException">java.lang.ArithmeticException: / by zero
+	at java.lang.reflect.Method.invoke
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:47)
+</error>
+  </testcase>
+</testsuite>

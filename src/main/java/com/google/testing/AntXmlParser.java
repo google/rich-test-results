@@ -24,10 +24,11 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * STaX parser for the Ant (Junit task) XML test results format.
  * @author alexeagle@google.com (Alex Eagle)
+ * @author pepstein@google.com (Peter Epstein)
  */
 public class AntXmlParser {
 
-  private static final String STACK_FRAME_PREFIX = "\tat ";
+  private static final String JAVA_STACK_FRAME_PREFIX = "\tat ";
   XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
   public static void main(String[] args) throws IOException {
@@ -209,35 +210,32 @@ public class AntXmlParser {
     try {
       String line;
       while ((line = reader.readLine()) != null) {
-        // Ignore first line, which seems to be redundant with attributes.
-        // Ignore any other lines that don't start with "at".
-        if (line.startsWith(STACK_FRAME_PREFIX)) {
-          int openParen = line.indexOf('(');
-          int closeParen = line.indexOf(')');
-          if (openParen < 0 || closeParen < 0) {
-            throw new XMLStreamException("Error parsing stack trace: " + line);
-          }
-          String classAndMethod = line.substring(STACK_FRAME_PREFIX.length(), openParen);
-          String fullyQualifiedClassname = classAndMethod
-              .substring(0, classAndMethod.lastIndexOf('.'));
-          String methodName = classAndMethod.substring(classAndMethod.lastIndexOf('.') + 1);
-          StackFrame.Builder stackFrameBuilder = stackTraceBuilder.addStackFrameBuilder()
-              .setFullyQualifiedClassname(fullyQualifiedClassname)
-              .setMethodName(methodName);
-
-
-          String fileAndLine = line.substring(openParen + 1, closeParen);
-          int colon = fileAndLine.indexOf(':');
-          if (colon > 0) {
-            String filename = fileAndLine.substring(0, colon);
-            int lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
-            stackFrameBuilder
-                .setFilename(filename)
-                .setLineNumber(lineNumber);
-          } else {
-            //TODO(pepstein): Record the text in parens, which might be "Native Method".
-          }
+        StackFrame.Builder stackFrameBuilder = stackTraceBuilder.addStackFrameBuilder();
+        int openParen = line.indexOf('(');
+        int closeParen = line.indexOf(')');
+        if (!line.startsWith(JAVA_STACK_FRAME_PREFIX) || openParen < 0 || closeParen < 0) {
+          stackFrameBuilder.setUnparsedLine(line);
+          continue;
         }
+
+        String fileAndLine = line.substring(openParen + 1, closeParen);
+        int colon = fileAndLine.indexOf(':');
+        if (colon <= 0) {
+          stackFrameBuilder.setUnparsedLine(line);
+          continue;
+        }
+
+        String classAndMethod = line.substring(JAVA_STACK_FRAME_PREFIX.length(), openParen);
+        String fullyQualifiedClassname = classAndMethod
+            .substring(0, classAndMethod.lastIndexOf('.'));
+        String methodName = classAndMethod.substring(classAndMethod.lastIndexOf('.') + 1);
+        String filename = fileAndLine.substring(0, colon);
+        int lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
+        stackFrameBuilder.getParsedLineBuilder()
+            .setFullyQualifiedClassname(fullyQualifiedClassname)
+            .setMethodName(methodName)
+            .setFilename(filename)
+            .setLineNumber(lineNumber);
       }
     } catch (IOException e) {
       throw new XMLStreamException("Error parsing stack trace", e);

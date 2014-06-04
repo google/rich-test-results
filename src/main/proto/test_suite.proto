@@ -14,6 +14,9 @@ message TestSuite {
 
     repeated Property property = 7;
     repeated TestCase test_case = 8;
+
+    // TODO(pepstein): Add to enable linkification of file:line number
+    // repeated Library library = 9; // To identify which version of which library a file comes from
 }
 
 // In Ant's junit task XML format, this message represents the node
@@ -30,4 +33,33 @@ message TestCase {
     optional string class_name = 1;
     optional string name = 2;
     optional int64 elapsed_time_millis = 3;
+    repeated StackTrace failure = 4; // An assertion failed.
+    optional StackTrace error = 5;   // An unexpected exception was thrown
 }
+
+// In Ant's junit task XML format, this message represents the node
+// <failure message="expected:&lt;1&gt; but was:&lt;2&gt;" type="java.lang.AssertionError">
+message StackTrace {
+    optional string exception_message = 1;
+    optional string exception_type = 2;
+    repeated StackFrame stack_frame = 3;
+    optional StackTrace cause = 4;
+}
+
+message StackFrame {
+    optional string fully_qualified_classname = 1;
+    optional string method_name = 2;
+    optional string filename = 3;
+    optional int32 line_number = 4;
+
+    // TODO(pepstein): Add to enable linkification of file:line number
+    // optional int32 library_index = 5; // Position in TestSuite.library repeated field
+}
+
+// TODO(pepstein): Add to enable linkification of file:line number
+// Used to identify which version of which library a file comes from
+// message Library {
+//     optional string group_id = 1;
+//     optional string artifact_id = 2;
+//     optional string version = 3;
+// }

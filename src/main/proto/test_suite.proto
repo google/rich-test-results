@@ -53,11 +53,12 @@ message StackTrace {
 // "        at org.junit.Assert.fail(Assert.java:88)"
 // TODO(pepstein): Switch to oneof when available.
 message StackContent {
-    optional string unparsed_text = 1;
+    optional string text = 1;
     optional CodeReference code_reference = 2;
 }
 
 message CodeReference {
-    optional string path = 1; // Path to source file. May be relative or absolute
-    optional int32 line_number = 2; // Line number within file
+    optional string text = 1; // Plain text to display within href.
+    optional string path = 2; // Path to source file. May be relative or absolute
+    optional int32 line_number = 3; // Line number within file
 }

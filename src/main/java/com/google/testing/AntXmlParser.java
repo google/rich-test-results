@@ -237,16 +237,18 @@ public class AntXmlParser {
 
         textBuilder.append(line.substring(0, openParen + 1));
         if (textBuilder.length() > 0) {
-          stackTraceBuilder.addStackContentBuilder().setUnparsedText(textBuilder.toString());
+          stackTraceBuilder.addStackContentBuilder().setText(textBuilder.toString());
           textBuilder = new StringBuilder();
         }
         stackTraceBuilder.addStackContentBuilder().getCodeReferenceBuilder()
+            .setText(fileAndLine)
             .setPath(path)
             .setLineNumber(lineNumber);
         textBuilder.append(line.substring(closeParen)).append("\n");
       }
+
       if (textBuilder.length() > 0) {
-        stackTraceBuilder.addStackContentBuilder().setUnparsedText(textBuilder.toString());
+        stackTraceBuilder.addStackContentBuilder().setText(textBuilder.toString());
       }
     } catch (IOException e) {
       throw new XMLStreamException("Error parsing stack trace", e);

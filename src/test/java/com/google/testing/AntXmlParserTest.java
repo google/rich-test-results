@@ -59,26 +59,26 @@ public class AntXmlParserTest {
             .addFailure(StackTrace.newBuilder()
                 .setExceptionMessage("expected:<1> but was:<2>")
                 .setExceptionType("java.lang.AssertionError")
-                .addStackContent(unparsed(
+                .addStackContent(text(
                     "java.lang.AssertionError: expected:<1> but was:<2>\n"
                         + "\tat org.junit.Assert.fail("))
-                .addStackContent(codeRef("org/junit/Assert.java", 88))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef("Assert.java:88", "org/junit/Assert.java", 88))
+                .addStackContent(text(")\n"
                     + "\tat org.junit.Assert.failNotEquals("))
-                .addStackContent(codeRef("org/junit/Assert.java", 743))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef("Assert.java:743", "org/junit/Assert.java", 743))
+                .addStackContent(text(")\n"
                     + "\tat org.junit.Assert.assertEquals("))
-                .addStackContent(codeRef("org/junit/Assert.java", 118))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef("Assert.java:118", "org/junit/Assert.java", 118))
+                .addStackContent(text(")\n"
                     + "\tat org.junit.Assert.assertEquals("))
-                .addStackContent(codeRef("org/junit/Assert.java", 555))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef("Assert.java:555", "org/junit/Assert.java", 555))
+                .addStackContent(text(")\n"
                     + "\tat org.junit.Assert.assertEquals("))
-                .addStackContent(codeRef("org/junit/Assert.java", 542))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef("Assert.java:542", "org/junit/Assert.java", 542))
+                .addStackContent(text(")\n"
                     + "\tat com.google.SimpleTest.testThatFails("))
-                .addStackContent(codeRef("com/google/SimpleTest.java", 11))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef("SimpleTest.java:11", "com/google/SimpleTest.java", 11))
+                .addStackContent(text(")\n"
                     + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"))))
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(0L)
@@ -88,9 +88,9 @@ public class AntXmlParserTest {
     assertThat(actual, is(expected));
   }
 
-  private StackContent unparsed(String unparsedText) {
+  private StackContent text(String unparsedText) {
     return StackContent.newBuilder()
-        .setUnparsedText(unparsedText)
+        .setText(unparsedText)
         .build();
   }
 
@@ -111,23 +111,27 @@ public class AntXmlParserTest {
             .setError(StackTrace.newBuilder()
                 .setExceptionMessage("/ by zero")
                 .setExceptionType("java.lang.ArithmeticException")
-                .addStackContent(unparsed("java.lang.ArithmeticException: / by zero\n"
+                .addStackContent(text("java.lang.ArithmeticException: / by zero\n"
                     + "\tat com.google.ExceptionThrownTest.testDivision("))
-                .addStackContent(codeRef("com/google/ExceptionThrownTest.java", 11))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef(
+                    "ExceptionThrownTest.java:11", "com/google/ExceptionThrownTest.java", 11))
+                .addStackContent(text(")\n"
                     + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"
                     + "\tat sun.reflect.NativeMethodAccessorImpl.invoke("))
-                .addStackContent(codeRef("sun/reflect/NativeMethodAccessorImpl.java", 57))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef(
+                    "NativeMethodAccessorImpl.java:57","sun/reflect/NativeMethodAccessorImpl.java", 57))
+                .addStackContent(text(")\n"
                     + "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke("))
-                .addStackContent(codeRef("sun/reflect/DelegatingMethodAccessorImpl.java", 43))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef(
+                    "DelegatingMethodAccessorImpl.java:43", "sun/reflect/DelegatingMethodAccessorImpl.java", 43))
+                .addStackContent(text(")\n"
                     + "\tat java.lang.reflect.Method.invoke("))
-                .addStackContent(codeRef("java/lang/reflect/Method.java", 606))
-                .addStackContent(unparsed(")\n"
+                .addStackContent(codeRef("Method.java:606", "java/lang/reflect/Method.java", 606))
+                .addStackContent(text(")\n"
                     + "\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall("))
-                .addStackContent(codeRef("org/junit/runners/model/FrameworkMethod.java", 47))
-                .addStackContent(unparsed(")\n"))))
+                .addStackContent(codeRef(
+                    "FrameworkMethod.java:47", "org/junit/runners/model/FrameworkMethod.java", 47))
+                .addStackContent(text(")\n"))))
         .build();
     assertThat(actual, is(expected));
   }
@@ -138,24 +142,28 @@ public class AntXmlParserTest {
     StackTrace.Builder expectedError = StackTrace.newBuilder()
         .setExceptionMessage("Division operation failed")
         .setExceptionType("java.lang.RuntimeException")
-        .addStackContent(unparsed("java.lang.RuntimeException: Division operation failed\n"
+        .addStackContent(text("java.lang.RuntimeException: Division operation failed\n"
             + "\tat com.google.NestedExceptionThrownTest.testDivision("))
-        .addStackContent(codeRef("com/google/NestedExceptionThrownTest.java", 14))
-        .addStackContent(unparsed(")\n"
+        .addStackContent(codeRef(
+            "NestedExceptionThrownTest.java:14", "com/google/NestedExceptionThrownTest.java", 14))
+        .addStackContent(text(")\n"
             + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"
             + "\tat sun.reflect.NativeMethodAccessorImpl.invoke("))
-        .addStackContent(codeRef("sun/reflect/NativeMethodAccessorImpl.java", 57))
-        .addStackContent(unparsed(")\n"
+        .addStackContent(codeRef(
+            "NativeMethodAccessorImpl.java:57", "sun/reflect/NativeMethodAccessorImpl.java", 57))
+        .addStackContent(text(")\n"
             + "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke("))
-        .addStackContent(codeRef("sun/reflect/DelegatingMethodAccessorImpl.java", 43))
-        .addStackContent(unparsed(")\n"
+        .addStackContent(codeRef(
+            "DelegatingMethodAccessorImpl.java:43", "sun/reflect/DelegatingMethodAccessorImpl.java", 43))
+        .addStackContent(text(")\n"
             + "\tat java.lang.reflect.Method.invoke("))
-        .addStackContent(codeRef("java/lang/reflect/Method.java", 606))
-        .addStackContent(unparsed(")\n"
+        .addStackContent(codeRef("Method.java:606", "java/lang/reflect/Method.java", 606))
+        .addStackContent(text(")\n"
             + "Caused by: java.lang.ArithmeticException: / by zero\n"
             + "\tat com.google.NestedExceptionThrownTest.testDivision("))
-        .addStackContent(codeRef("com/google/NestedExceptionThrownTest.java", 12))
-        .addStackContent(unparsed(")\n"
+        .addStackContent(codeRef(
+            "NestedExceptionThrownTest.java:12", "com/google/NestedExceptionThrownTest.java", 12))
+        .addStackContent(text(")\n"
             + "\t... 4 more\n"));
     TestSuite expected = TestSuite.newBuilder()
         .setName("com.google.NestedExceptionThrownTest")
@@ -190,18 +198,20 @@ public class AntXmlParserTest {
             .setError(StackTrace.newBuilder()
                 .setExceptionMessage("/ by zero")
                 .setExceptionType("java.lang.ArithmeticException")
-                .addStackContent(unparsed("java.lang.ArithmeticException: / by zero\n"
+                .addStackContent(text("java.lang.ArithmeticException: / by zero\n"
                     + "\tat java.lang.reflect.Method.invoke\n"
                     + "\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall("))
-                .addStackContent(codeRef("org/junit/runners/model/FrameworkMethod.java", 47))
-                .addStackContent(unparsed(")\n"))))
+                .addStackContent(codeRef(
+                    "FrameworkMethod.java:47", "org/junit/runners/model/FrameworkMethod.java", 47))
+                .addStackContent(text(")\n"))))
         .build();
     assertThat(actual, is(expected));
   }
 
-  private StackContent codeRef(String path, int lineNumber) {
+  private StackContent codeRef(String text, String path, int lineNumber) {
     return StackContent.newBuilder()
         .setCodeReference(CodeReference.newBuilder()
+            .setText(text)
             .setPath(path)
             .setLineNumber(lineNumber))
         .build();

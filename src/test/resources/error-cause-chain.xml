@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="0.007" errors="1" skipped="0" tests="1" name="com.google.NestedExceptionThrownTest">
+  <testcase time="0.007" classname="com.google.NestedExceptionThrownTest" name="testDivision">
+    <error message="Division operation failed" type="java.lang.RuntimeException">java.lang.RuntimeException: Division operation failed
+	at com.google.NestedExceptionThrownTest.testDivision(NestedExceptionThrownTest.java:14)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+Caused by: java.lang.ArithmeticException: / by zero
+	at com.google.NestedExceptionThrownTest.testDivision(NestedExceptionThrownTest.java:12)
+	... 4 more
+</error>
+  </testcase>
+</testsuite>

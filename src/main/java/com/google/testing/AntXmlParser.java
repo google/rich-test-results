@@ -4,12 +4,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.protobuf.TextFormat;
 import com.google.testing.TestSuiteProto.Property.Builder;
-import com.google.testing.TestSuiteProto.StackFrame;
 import com.google.testing.TestSuiteProto.StackTrace;
 import com.google.testing.TestSuiteProto.TestCase;
 import com.google.testing.TestSuiteProto.TestSuite;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -208,34 +208,45 @@ public class AntXmlParser {
 
     BufferedReader reader = new BufferedReader(new StringReader(stackTrace));
     try {
+      StringBuilder textBuilder = new StringBuilder();
       String line;
       while ((line = reader.readLine()) != null) {
-        StackFrame.Builder stackFrameBuilder = stackTraceBuilder.addStackFrameBuilder();
         int openParen = line.indexOf('(');
         int closeParen = line.indexOf(')');
         if (!line.startsWith(JAVA_STACK_FRAME_PREFIX) || openParen < 0 || closeParen < 0) {
-          stackFrameBuilder.setUnparsedLine(line);
+          textBuilder.append(line).append("\n");
           continue;
         }
 
         String fileAndLine = line.substring(openParen + 1, closeParen);
         int colon = fileAndLine.indexOf(':');
         if (colon <= 0) {
-          stackFrameBuilder.setUnparsedLine(line);
+          textBuilder.append(line).append("\n");
           continue;
         }
 
         String classAndMethod = line.substring(JAVA_STACK_FRAME_PREFIX.length(), openParen);
         String fullyQualifiedClassname = classAndMethod
             .substring(0, classAndMethod.lastIndexOf('.'));
-        String methodName = classAndMethod.substring(classAndMethod.lastIndexOf('.') + 1);
+        String packageName = fullyQualifiedClassname
+            .substring(0, fullyQualifiedClassname.lastIndexOf("."));
+        String directory = packageName.replaceAll("\\.", File.separator);
         String filename = fileAndLine.substring(0, colon);
+        String path = directory + File.separator + filename;
         int lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
-        stackFrameBuilder.getParsedLineBuilder()
-            .setFullyQualifiedClassname(fullyQualifiedClassname)
-            .setMethodName(methodName)
-            .setFilename(filename)
+
+        textBuilder.append(line.substring(0, openParen + 1));
+        if (textBuilder.length() > 0) {
+          stackTraceBuilder.addStackContentBuilder().setUnparsedText(textBuilder.toString());
+          textBuilder = new StringBuilder();
+        }
+        stackTraceBuilder.addStackContentBuilder().getCodeReferenceBuilder()
+            .setPath(path)
             .setLineNumber(lineNumber);
+        textBuilder.append(line.substring(closeParen)).append("\n");
+      }
+      if (textBuilder.length() > 0) {
+        stackTraceBuilder.addStackContentBuilder().setUnparsedText(textBuilder.toString());
       }
     } catch (IOException e) {
       throw new XMLStreamException("Error parsing stack trace", e);

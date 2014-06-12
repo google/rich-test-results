@@ -46,22 +46,18 @@ message StackTrace {
     optional string exception_type = 2;
     repeated Property unrecognized_attributes = 3;
 
-    repeated StackFrame stack_frame = 4; // In the order they're conventionally displayed.
-    optional StackTrace cause = 5;
+    repeated StackContent stack_content = 4;
 }
 
 // In Ant's junit task XML format, this message represents a line within a <failure> such as
 // "        at org.junit.Assert.fail(Assert.java:88)"
 // TODO(pepstein): Switch to oneof when available.
-message StackFrame {
-    optional string unparsed_line = 1;
-    optional ParsedStackFrame parsed_line = 2;
+message StackContent {
+    optional string unparsed_text = 1;
+    optional CodeReference code_reference = 2;
 }
 
-message ParsedStackFrame {
-    optional string fully_qualified_classname = 1;
-    optional string method_name = 2;
-    optional string filename = 3;
-    optional int32 line_number = 4;
-    // TODO(pepstein): Add logs-to-source link info to identify version of file
+message CodeReference {
+    optional string path = 1; // Path to source file. May be relative or absolute
+    optional int32 line_number = 2; // Line number within file
 }

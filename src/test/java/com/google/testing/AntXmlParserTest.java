@@ -4,10 +4,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import com.google.testing.TestSuiteProto.ParsedStackFrame;
+import com.google.testing.TestSuiteProto.CodeReference;
 import com.google.testing.TestSuiteProto.Property;
-import com.google.testing.TestSuiteProto.StackFrame;
-import com.google.testing.TestSuiteProto.StackFrame.Builder;
+import com.google.testing.TestSuiteProto.StackContent;
 import com.google.testing.TestSuiteProto.StackTrace;
 import com.google.testing.TestSuiteProto.TestCase;
 import com.google.testing.TestSuiteProto.TestSuite;
@@ -60,22 +59,27 @@ public class AntXmlParserTest {
             .addFailure(StackTrace.newBuilder()
                 .setExceptionMessage("expected:<1> but was:<2>")
                 .setExceptionType("java.lang.AssertionError")
-                .addStackFrame(createUnparsedStackFrame(
-                    "java.lang.AssertionError: expected:<1> but was:<2>"))
-                .addStackFrame(createStackFrame("org.junit.Assert", "fail", "Assert.java", 88))
-                .addStackFrame(
-                    createStackFrame("org.junit.Assert", "failNotEquals", "Assert.java", 743))
-                .addStackFrame(
-                    createStackFrame("org.junit.Assert", "assertEquals", "Assert.java", 118))
-                .addStackFrame(
-                    createStackFrame("org.junit.Assert", "assertEquals", "Assert.java", 555))
-                .addStackFrame(
-                    createStackFrame("org.junit.Assert", "assertEquals", "Assert.java", 542))
-                .addStackFrame(
-                    createStackFrame("com.google.SimpleTest", "testThatFails", "SimpleTest.java",
-                        11))
-                .addStackFrame(createUnparsedStackFrame(
-                        "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)"))))
+                .addStackContent(unparsed(
+                    "java.lang.AssertionError: expected:<1> but was:<2>\n"
+                        + "\tat org.junit.Assert.fail("))
+                .addStackContent(codeRef("org/junit/Assert.java", 88))
+                .addStackContent(unparsed(")\n"
+                    + "\tat org.junit.Assert.failNotEquals("))
+                .addStackContent(codeRef("org/junit/Assert.java", 743))
+                .addStackContent(unparsed(")\n"
+                    + "\tat org.junit.Assert.assertEquals("))
+                .addStackContent(codeRef("org/junit/Assert.java", 118))
+                .addStackContent(unparsed(")\n"
+                    + "\tat org.junit.Assert.assertEquals("))
+                .addStackContent(codeRef("org/junit/Assert.java", 555))
+                .addStackContent(unparsed(")\n"
+                    + "\tat org.junit.Assert.assertEquals("))
+                .addStackContent(codeRef("org/junit/Assert.java", 542))
+                .addStackContent(unparsed(")\n"
+                    + "\tat com.google.SimpleTest.testThatFails("))
+                .addStackContent(codeRef("com/google/SimpleTest.java", 11))
+                .addStackContent(unparsed(")\n"
+                    + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"))))
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(0L)
             .setClassName("com.google.SimpleTest")
@@ -84,9 +88,9 @@ public class AntXmlParserTest {
     assertThat(actual, is(expected));
   }
 
-  private StackFrame createUnparsedStackFrame(String unparsedLine) {
-    return StackFrame.newBuilder()
-        .setUnparsedLine(unparsedLine)
+  private StackContent unparsed(String unparsedText) {
+    return StackContent.newBuilder()
+        .setUnparsedText(unparsedText)
         .build();
   }
 
@@ -107,20 +111,64 @@ public class AntXmlParserTest {
             .setError(StackTrace.newBuilder()
                 .setExceptionMessage("/ by zero")
                 .setExceptionType("java.lang.ArithmeticException")
-                .addStackFrame(createUnparsedStackFrame("java.lang.ArithmeticException: / by zero"))
-                .addStackFrame(createStackFrame("com.google.ExceptionThrownTest", "testDivision",
-                    "ExceptionThrownTest.java", 11))
-                .addStackFrame(createUnparsedStackFrame(
-                    "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)"))
-                .addStackFrame(createStackFrame("sun.reflect.NativeMethodAccessorImpl", "invoke",
-                    "NativeMethodAccessorImpl.java", 57))
-                .addStackFrame(createStackFrame("sun.reflect.DelegatingMethodAccessorImpl",
-                    "invoke",
-                    "DelegatingMethodAccessorImpl.java", 43))
-                .addStackFrame(createStackFrame("java.lang.reflect.Method", "invoke", "Method.java",
-                    606))
-                .addStackFrame(createStackFrame("org.junit.runners.model.FrameworkMethod$1", "runReflectiveCall",
-                    "FrameworkMethod.java", 47))))
+                .addStackContent(unparsed("java.lang.ArithmeticException: / by zero\n"
+                    + "\tat com.google.ExceptionThrownTest.testDivision("))
+                .addStackContent(codeRef("com/google/ExceptionThrownTest.java", 11))
+                .addStackContent(unparsed(")\n"
+                    + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"
+                    + "\tat sun.reflect.NativeMethodAccessorImpl.invoke("))
+                .addStackContent(codeRef("sun/reflect/NativeMethodAccessorImpl.java", 57))
+                .addStackContent(unparsed(")\n"
+                    + "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke("))
+                .addStackContent(codeRef("sun/reflect/DelegatingMethodAccessorImpl.java", 43))
+                .addStackContent(unparsed(")\n"
+                    + "\tat java.lang.reflect.Method.invoke("))
+                .addStackContent(codeRef("java/lang/reflect/Method.java", 606))
+                .addStackContent(unparsed(")\n"
+                    + "\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall("))
+                .addStackContent(codeRef("org/junit/runners/model/FrameworkMethod.java", 47))
+                .addStackContent(unparsed(")\n"))))
+        .build();
+    assertThat(actual, is(expected));
+  }
+
+  @Test public void shouldParseTestErrorCauseChain() throws Exception {
+    AntXmlParser parser = new AntXmlParser();
+    TestSuite actual = parser.parse(getClass().getResourceAsStream("/error-cause-chain.xml"), UTF_8);
+    StackTrace.Builder expectedError = StackTrace.newBuilder()
+        .setExceptionMessage("Division operation failed")
+        .setExceptionType("java.lang.RuntimeException")
+        .addStackContent(unparsed("java.lang.RuntimeException: Division operation failed\n"
+            + "\tat com.google.NestedExceptionThrownTest.testDivision("))
+        .addStackContent(codeRef("com/google/NestedExceptionThrownTest.java", 14))
+        .addStackContent(unparsed(")\n"
+            + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"
+            + "\tat sun.reflect.NativeMethodAccessorImpl.invoke("))
+        .addStackContent(codeRef("sun/reflect/NativeMethodAccessorImpl.java", 57))
+        .addStackContent(unparsed(")\n"
+            + "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke("))
+        .addStackContent(codeRef("sun/reflect/DelegatingMethodAccessorImpl.java", 43))
+        .addStackContent(unparsed(")\n"
+            + "\tat java.lang.reflect.Method.invoke("))
+        .addStackContent(codeRef("java/lang/reflect/Method.java", 606))
+        .addStackContent(unparsed(")\n"
+            + "Caused by: java.lang.ArithmeticException: / by zero\n"
+            + "\tat com.google.NestedExceptionThrownTest.testDivision("))
+        .addStackContent(codeRef("com/google/NestedExceptionThrownTest.java", 12))
+        .addStackContent(unparsed(")\n"
+            + "\t... 4 more\n"));
+    TestSuite expected = TestSuite.newBuilder()
+        .setName("com.google.NestedExceptionThrownTest")
+        .setTotalCount(1)
+        .setFailureCount(0)
+        .setErrorCount(1)
+        .setSkippedCount(0)
+        .setElapsedTimeMillis(7L)
+        .addTestCase(TestCase.newBuilder()
+            .setElapsedTimeMillis(7L)
+            .setClassName("com.google.NestedExceptionThrownTest")
+            .setName("testDivision")
+            .setError(expectedError))
         .build();
     assertThat(actual, is(expected));
   }
@@ -142,22 +190,21 @@ public class AntXmlParserTest {
             .setError(StackTrace.newBuilder()
                 .setExceptionMessage("/ by zero")
                 .setExceptionType("java.lang.ArithmeticException")
-                .addStackFrame(createUnparsedStackFrame("java.lang.ArithmeticException: / by zero"))
-                .addStackFrame(createUnparsedStackFrame("\tat java.lang.reflect.Method.invoke"))
-                .addStackFrame(createStackFrame("org.junit.runners.model.FrameworkMethod$1",
-                    "runReflectiveCall", "FrameworkMethod.java", 47))))
+                .addStackContent(unparsed("java.lang.ArithmeticException: / by zero\n"
+                    + "\tat java.lang.reflect.Method.invoke\n"
+                    + "\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall("))
+                .addStackContent(codeRef("org/junit/runners/model/FrameworkMethod.java", 47))
+                .addStackContent(unparsed(")\n"))))
         .build();
     assertThat(actual, is(expected));
   }
 
-  private Builder createStackFrame(String fullyQualifiedClassname, String methodName,
-      String filename, int lineNumber) {
-    return StackFrame.newBuilder()
-        .setParsedLine(ParsedStackFrame.newBuilder()
-            .setFullyQualifiedClassname(fullyQualifiedClassname)
-            .setMethodName(methodName)
-            .setFilename(filename)
-            .setLineNumber(lineNumber));
+  private StackContent codeRef(String path, int lineNumber) {
+    return StackContent.newBuilder()
+        .setCodeReference(CodeReference.newBuilder()
+            .setPath(path)
+            .setLineNumber(lineNumber))
+        .build();
   }
 
   @Test public void shouldParseSimpleXmlWithComments() throws Exception {

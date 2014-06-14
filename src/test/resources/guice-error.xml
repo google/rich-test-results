@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="0.152" errors="1" skipped="0" tests="1" name="com.google.GuiceExceptionTest">
+  <testcase time="0.152" classname="com.google.GuiceExceptionTest" name="testGuiceException">
+    <error message="Guice creation errors:
+
+1) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$A() was bound.
+  at com.google.GuiceExceptionTest$MyModule.provideA(GuiceExceptionTest.java:44)
+
+2) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$B() was bound.
+  at com.google.GuiceExceptionTest$MyModule.provideB(GuiceExceptionTest.java:49)
+
+2 errors" type="com.google.inject.CreationException">com.google.inject.CreationException: Guice creation errors:
+
+1) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$A() was bound.
+  at com.google.GuiceExceptionTest$MyModule.provideA(GuiceExceptionTest.java:44)
+
+2) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$B() was bound.
+  at com.google.GuiceExceptionTest$MyModule.provideB(GuiceExceptionTest.java:49)
+
+2 errors
+	at com.google.inject.internal.Errors.throwCreationExceptionIfErrorsExist(Errors.java:435)
+	at com.google.inject.internal.InternalInjectorCreator.initializeStatically(InternalInjectorCreator.java:154)
+	at com.google.inject.internal.InternalInjectorCreator.build(InternalInjectorCreator.java:106)
+	at com.google.inject.Guice.createInjector(Guice.java:95)
+	at com.google.inject.Guice.createInjector(Guice.java:72)
+	at com.google.inject.Guice.createInjector(Guice.java:62)
+	at com.google.GuiceExceptionTest.testGuiceException(GuiceExceptionTest.java:21)
+</error>
+  </testcase>
+</testsuite>

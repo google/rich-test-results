@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 public class AntXmlParser {
 
   private static final String JAVA_STACK_FRAME_PREFIX = "\tat ";
+
   XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
   public static void main(String[] args) throws IOException {
@@ -211,40 +212,7 @@ public class AntXmlParser {
       StringBuilder textBuilder = new StringBuilder();
       String line;
       while ((line = reader.readLine()) != null) {
-        int openParen = line.indexOf('(');
-        int closeParen = line.indexOf(')');
-        if (!line.startsWith(JAVA_STACK_FRAME_PREFIX) || openParen < 0 || closeParen < 0) {
-          textBuilder.append(line).append("\n");
-          continue;
-        }
-
-        String fileAndLine = line.substring(openParen + 1, closeParen);
-        int colon = fileAndLine.indexOf(':');
-        if (colon <= 0) {
-          textBuilder.append(line).append("\n");
-          continue;
-        }
-
-        String classAndMethod = line.substring(JAVA_STACK_FRAME_PREFIX.length(), openParen);
-        String fullyQualifiedClassname = classAndMethod
-            .substring(0, classAndMethod.lastIndexOf('.'));
-        String packageName = fullyQualifiedClassname
-            .substring(0, fullyQualifiedClassname.lastIndexOf("."));
-        String directory = packageName.replaceAll("\\.", File.separator);
-        String filename = fileAndLine.substring(0, colon);
-        String path = directory + File.separator + filename;
-        int lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
-
-        textBuilder.append(line.substring(0, openParen + 1));
-        if (textBuilder.length() > 0) {
-          stackTraceBuilder.addStackContentBuilder().setText(textBuilder.toString());
-          textBuilder = new StringBuilder();
-        }
-        stackTraceBuilder.addStackContentBuilder().getCodeReferenceBuilder()
-            .setText(fileAndLine)
-            .setPath(path)
-            .setLineNumber(lineNumber);
-        textBuilder.append(line.substring(closeParen)).append("\n");
+        parseLine(stackTraceBuilder, textBuilder, line);
       }
 
       if (textBuilder.length() > 0) {
@@ -252,8 +220,49 @@ public class AntXmlParser {
       }
     } catch (IOException e) {
       throw new XMLStreamException("Error parsing stack trace", e);
-    } catch (NumberFormatException e) {
-      throw new XMLStreamException("Error parsing line number in stack frame", e);
+    }
+  }
+
+  private void parseLine(
+      StackTrace.Builder stackTraceBuilder, StringBuilder textBuilder, String line)
+      throws XMLStreamException {
+    try {
+      int openParen = line.indexOf('(');
+      int closeParen = line.indexOf(')');
+      if (!line.startsWith(JAVA_STACK_FRAME_PREFIX) || openParen < 0 || closeParen < 0) {
+        textBuilder.append(line).append("\n");
+        return;
+      }
+
+      String fileAndLine = line.substring(openParen + 1, closeParen);
+      int colon = fileAndLine.indexOf(':');
+      if (colon <= 0) {
+        textBuilder.append(line).append("\n");
+        return;
+      }
+
+      String classAndMethod = line.substring(JAVA_STACK_FRAME_PREFIX.length(), openParen);
+      String fullyQualifiedClassname = classAndMethod
+          .substring(0, classAndMethod.lastIndexOf('.'));
+      String packageName = fullyQualifiedClassname
+          .substring(0, fullyQualifiedClassname.lastIndexOf("."));
+      String directory = packageName.replaceAll("\\.", File.separator);
+      String filename = fileAndLine.substring(0, colon);
+      String path = directory + File.separator + filename;
+      int lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
+
+      textBuilder.append(line.substring(0, openParen + 1));
+      if (textBuilder.length() > 0) {
+        stackTraceBuilder.addStackContentBuilder().setText(textBuilder.toString());
+        textBuilder.setLength(0);
+      }
+      stackTraceBuilder.addStackContentBuilder().getCodeReferenceBuilder()
+          .setText(fileAndLine)
+          .setPath(path)
+          .setLineNumber(lineNumber);
+      textBuilder.append(line.substring(closeParen)).append("\n");
+    } catch (Exception e) {
+    throw new XMLStreamException("Error parsing stack trace on line:\n" + line + "\n", e);
     }
   }
 }

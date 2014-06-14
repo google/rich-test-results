@@ -11,6 +11,7 @@ import com.google.testing.TestSuiteProto.StackTrace;
 import com.google.testing.TestSuiteProto.TestCase;
 import com.google.testing.TestSuiteProto.TestSuite;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -176,6 +177,74 @@ public class AntXmlParserTest {
             .setElapsedTimeMillis(7L)
             .setClassName("com.google.NestedExceptionThrownTest")
             .setName("testDivision")
+            .setError(expectedError))
+        .build();
+    assertThat(actual, is(expected));
+  }
+
+  @Ignore("Guice stack lines start with 2 spaces rather than tab, which we don't handle yet")
+  @Test public void shouldParseTestGuiceError() throws Exception {
+    AntXmlParser parser = new AntXmlParser();
+    TestSuite actual = parser.parse(getClass().getResourceAsStream("/guice-error.xml"), UTF_8);
+    StackTrace.Builder expectedError = StackTrace.newBuilder()
+        .setExceptionMessage(("Guice creation errors:\n"
+            + "\n"
+            + "1) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$A() was bound.\n"
+            + "  at com.google.GuiceExceptionTest$MyModule.provideA(GuiceExceptionTest.java:44)\n"
+            + "\n"
+            + "2) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$B() was bound.\n"
+            + "  at com.google.GuiceExceptionTest$MyModule.provideB(GuiceExceptionTest.java:49)\n"
+            + "\n"
+            + "2 errors").replaceAll("\n", " "))
+        .setExceptionType("com.google.inject.CreationException")
+        .addStackContent(text("com.google.inject.CreationException: Guice creation errors:\n"
+            + "\n"
+            + "1) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$A() was bound.\n"
+            + "  at com.google.GuiceExceptionTest$MyModule.provideA("))
+        .addStackContent(codeRef(
+            "GuiceExceptionTest.java:44", "com/google/GuiceExceptionTest.java", 44))
+        .addStackContent(text(")\n"
+            + "\n"
+            + "2) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$B() was bound.\n"
+            + "  at com.google.GuiceExceptionTest$MyModule.provideB("))
+        .addStackContent(codeRef(
+            "GuiceExceptionTest.java:49", "com/google/GuiceExceptionTest.java", 49))
+        .addStackContent(text(")\n"
+            + "\n"
+            + "2 errors\n"
+            + "\tat com.google.inject.internal.Errors.throwCreationExceptionIfErrorsExist("))
+        .addStackContent(codeRef("Errors.java:435", "com/google/inject/internal/Errors.java", 435))
+        .addStackContent(text(")\n"
+            + "\tat com.google.inject.internal.InternalInjectorCreator.initializeStatically("))
+        .addStackContent(codeRef("InternalInjectorCreator.java:154", "com/google/inject/internal/InternalInjectorCreator.java", 154))
+        .addStackContent(text(")\n"
+            + "\tat com.google.inject.internal.InternalInjectorCreator.build("))
+        .addStackContent(codeRef("InternalInjectorCreator.java:106", "com/google/inject/internal/InternalInjectorCreator.java", 106))
+        .addStackContent(text(")\n"
+            + "\tat com.google.inject.Guice.createInjector("))
+        .addStackContent(codeRef("Guice.java:95", "com/google/inject/Guice.java", 95))
+        .addStackContent(text(")\n"
+            + "\tat com.google.inject.Guice.createInjector("))
+        .addStackContent(codeRef("Guice.java:72", "com/google/inject/Guice.java", 72))
+        .addStackContent(text(")\n"
+            + "\tat com.google.inject.Guice.createInjector("))
+        .addStackContent(codeRef("Guice.java:62", "com/google/inject/Guice.java", 62))
+        .addStackContent(text(")\n"
+            + "\tat com.google.GuiceExceptionTest.testGuiceException("))
+        .addStackContent(codeRef(
+            "GuiceExceptionTest.java:21", "com/google/GuiceExceptionTest.java", 21))
+        .addStackContent(text(")\n"));
+    TestSuite expected = TestSuite.newBuilder()
+        .setName("com.google.GuiceExceptionTest")
+        .setTotalCount(1)
+        .setFailureCount(0)
+        .setErrorCount(1)
+        .setSkippedCount(0)
+        .setElapsedTimeMillis(152L)
+        .addTestCase(TestCase.newBuilder()
+            .setElapsedTimeMillis(152L)
+            .setClassName("com.google.GuiceExceptionTest")
+            .setName("testGuiceException")
             .setError(expectedError))
         .build();
     assertThat(actual, is(expected));

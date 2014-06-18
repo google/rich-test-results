@@ -1,4 +1,4 @@
-package com.google.testing;
+package com.google.testing.results;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

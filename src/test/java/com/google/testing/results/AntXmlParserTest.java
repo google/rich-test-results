@@ -1,4 +1,4 @@
-package com.google.testing;
+package com.google.testing.results;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
@@ -10,6 +10,7 @@ import com.google.testing.TestSuiteProto.StackContent;
 import com.google.testing.TestSuiteProto.StackTrace;
 import com.google.testing.TestSuiteProto.TestCase;
 import com.google.testing.TestSuiteProto.TestSuite;
+import com.google.testing.results.AntXmlParser;
 
 import org.junit.Ignore;
 import org.junit.Test;

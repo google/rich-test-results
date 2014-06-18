@@ -1,4 +1,4 @@
-package com.google.testing;
+package com.google.testing.results;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.write;
@@ -10,6 +10,8 @@ import com.google.jimfs.Configuration;
 import com.google.jimfs.Jimfs;
 import com.google.testing.TestResultsProto.TestResults;
 import com.google.testing.TestSuiteProto.TestSuite;
+import com.google.testing.results.DirectoryBasedOutputsCollector;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

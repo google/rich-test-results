@@ -4,12 +4,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import com.google.testing.TestSuiteProto.CodeReference;
-import com.google.testing.TestSuiteProto.Property;
-import com.google.testing.TestSuiteProto.StackContent;
-import com.google.testing.TestSuiteProto.StackTrace;
-import com.google.testing.TestSuiteProto.TestCase;
-import com.google.testing.TestSuiteProto.TestSuite;
+import com.google.testing.results.TestSuiteProto.CodeReference;
+import com.google.testing.results.TestSuiteProto.Property;
+import com.google.testing.results.TestSuiteProto.StackContent;
+import com.google.testing.results.TestSuiteProto.StackTrace;
+import com.google.testing.results.TestSuiteProto.TestCase;
+import com.google.testing.results.TestSuiteProto.TestSuite;
 import com.google.testing.results.AntXmlParser;
 
 import org.junit.Ignore;

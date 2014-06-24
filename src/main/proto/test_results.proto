@@ -1,5 +1,5 @@
 // Top-level data structure representing all the outputs from one execution of the build/test tool
-option java_package = "com.google.testing";
+option java_package = "com.google.testing.results";
 option java_outer_classname = "TestResultsProto";
 import "test_suite.proto";
 

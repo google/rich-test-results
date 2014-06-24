@@ -8,8 +8,8 @@ import static org.junit.Assert.assertThat;
 
 import com.google.jimfs.Configuration;
 import com.google.jimfs.Jimfs;
-import com.google.testing.TestResultsProto.TestResults;
-import com.google.testing.TestSuiteProto.TestSuite;
+import com.google.testing.results.TestResultsProto.TestResults;
+import com.google.testing.results.TestSuiteProto.TestSuite;
 import com.google.testing.results.DirectoryBasedOutputsCollector;
 
 import org.junit.After;

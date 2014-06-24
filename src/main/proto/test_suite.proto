@@ -1,4 +1,4 @@
-option java_package = "com.google.testing";
+option java_package = "com.google.testing.results";
 option java_outer_classname = "TestSuiteProto";
 
 // In Ant's junit task XML format, this message represents the node

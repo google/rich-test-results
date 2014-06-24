@@ -3,10 +3,10 @@ package com.google.testing.results;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.protobuf.TextFormat;
-import com.google.testing.TestSuiteProto.Property.Builder;
-import com.google.testing.TestSuiteProto.StackTrace;
-import com.google.testing.TestSuiteProto.TestCase;
-import com.google.testing.TestSuiteProto.TestSuite;
+import com.google.testing.results.TestSuiteProto.Property.Builder;
+import com.google.testing.results.TestSuiteProto.StackTrace;
+import com.google.testing.results.TestSuiteProto.TestCase;
+import com.google.testing.results.TestSuiteProto.TestSuite;
 
 import java.io.BufferedReader;
 import java.io.File;

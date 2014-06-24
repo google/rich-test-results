@@ -4,7 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-import com.google.testing.TestResultsProto.TestResults;
+import com.google.testing.results.TestResultsProto.TestResults;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

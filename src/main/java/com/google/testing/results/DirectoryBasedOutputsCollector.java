@@ -44,7 +44,7 @@ public class DirectoryBasedOutputsCollector {
         }
         if (Iterables.any(file, LOOKS_LIKE_TEST_DIRECTORY) &&
             file.getFileName().toString().endsWith(".xml")) {
-          builder.addTestSuite(xmlParser.parse(Files.newInputStream(file), UTF_8));
+          builder.addAllTestSuite(xmlParser.parse(Files.newInputStream(file), UTF_8));
         }
 
         return FileVisitResult.CONTINUE;

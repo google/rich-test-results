@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -34,12 +36,15 @@ public class AntXmlParser {
 
   public static void main(String[] args) throws IOException {
     String path = args[0];
-    TestSuite testSuite = new AntXmlParser().parse(new FileInputStream(path), UTF_8);
-    TextFormat.print(testSuite, System.out);
+    List<TestSuite> testSuites = new AntXmlParser()
+        .parse(new FileInputStream(path), UTF_8);
+    for (TestSuite testSuite : testSuites) {
+      TextFormat.print(testSuite, System.out);
+    }
   }
 
-  public TestSuite parse(InputStream in, Charset encoding) {
-    TestSuite.Builder builder = TestSuite.newBuilder();
+  public List<TestSuite> parse(InputStream in, Charset encoding) {
+    List<TestSuite> testSuites = new ArrayList<>();
     try {
       XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(in, encoding.name());
       while (xmlStreamReader.hasNext()) {
@@ -51,8 +56,11 @@ public class AntXmlParser {
           continue;
         }
         switch (xmlStreamReader.getName().toString()) {
+          case "testsuites":
+            parseSuites(xmlStreamReader, testSuites);
+            break;
           case "testsuite":
-            parseSuite(xmlStreamReader, builder);
+            parseSuite(xmlStreamReader, testSuites);
             break;
           default:
         }
@@ -61,10 +69,32 @@ public class AntXmlParser {
     } catch (XMLStreamException e) {
       throw new RuntimeException(e);
     }
-    return builder.build();
+
+    return testSuites;
   }
 
-  private void parseSuite(XMLStreamReader xmlStreamReader, TestSuite.Builder builder) throws XMLStreamException {
+  private void parseSuites(XMLStreamReader xmlStreamReader,
+      List<TestSuite> testSuites) throws XMLStreamException {
+    String tagName = null;
+    do {
+      xmlStreamReader.next();
+      if (!xmlStreamReader.hasName()) {
+        continue;
+      }
+      tagName = xmlStreamReader.getName().toString();
+      if (xmlStreamReader.isStartElement()) {
+        switch (tagName) {
+          case "testsuite":
+            parseSuite(xmlStreamReader, testSuites);
+            break;
+        }
+      }
+    } while (!xmlStreamReader.isEndElement() || !"testsuites".equals(tagName));
+  }
+
+  private void parseSuite(XMLStreamReader xmlStreamReader,
+      List<TestSuite> testSuites) throws XMLStreamException {
+    TestSuite.Builder builder = TestSuite.newBuilder();
     for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
       String attributeValue = xmlStreamReader.getAttributeValue(i);
       switch (xmlStreamReader.getAttributeName(i).toString()) {
@@ -107,6 +137,7 @@ public class AntXmlParser {
         }
       }
     } while (!xmlStreamReader.isEndElement() || !"testsuite".equals(tagName));
+    testSuites.add(builder.build());
   }
 
   private void parseProperties(XMLStreamReader xmlStreamReader, TestSuite.Builder suiteBuilder)
@@ -262,7 +293,7 @@ public class AntXmlParser {
           .setLineNumber(lineNumber);
       textBuilder.append(line.substring(closeParen)).append("\n");
     } catch (Exception e) {
-    throw new XMLStreamException("Error parsing stack trace on line:\n" + line + "\n", e);
+      throw new XMLStreamException("Error parsing stack trace on line:\n" + line + "\n", e);
     }
   }
 }

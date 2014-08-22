@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+    <testsuite failures="1" time="0.068" errors="2" skipped="4" tests="8" name="com.google.errorprone.matchers.ConstructorOfClassTest">
+        <properties>
+            <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+            <property name="sun.cpu.isalist" value=""/>
+        </properties>
+        <testcase time="0.017" classname="com.google.errorprone.matchers.ConstructorOfClassTest" name="shouldMatchSingleConstructor"/>
+    </testsuite>
+    <testsuite failures="1" time="0.006" errors="0" skipped="0" tests="2" name="com.google.SimpleTest">
+        <testcase time="0.006" classname="com.google.SimpleTest" name="testThatFails">
+            <failure message="expected:&lt;1&gt; but was:&lt;2&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;1&gt; but was:&lt;2&gt;
+	at org.junit.Assert.fail(Assert.java:88)
+	at org.junit.Assert.failNotEquals(Assert.java:743)
+	at org.junit.Assert.assertEquals(Assert.java:118)
+	at org.junit.Assert.assertEquals(Assert.java:555)
+	at org.junit.Assert.assertEquals(Assert.java:542)
+	at com.google.SimpleTest.testThatFails(SimpleTest.java:11)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+</failure>
+        </testcase>
+        <testcase time="0" classname="com.google.SimpleTest" name="testThatPasses"/>
+    </testsuite>
+</testsuites>

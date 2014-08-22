@@ -37,6 +37,11 @@
       <version>1.0-rc1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.truth</groupId>
+      <artifactId>truth</artifactId>
+      <version>0.23</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

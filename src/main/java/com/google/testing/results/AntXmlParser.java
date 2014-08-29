@@ -2,6 +2,8 @@ package com.google.testing.results;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.io.Closeables;
 import com.google.protobuf.TextFormat;
 import com.google.testing.results.TestSuiteProto.Property.Builder;
 import com.google.testing.results.TestSuiteProto.StackTrace;
@@ -29,53 +31,58 @@ import javax.xml.stream.XMLStreamReader;
  * @author pepstein@google.com (Peter Epstein)
  */
 public class AntXmlParser {
-
   private static final String JAVA_STACK_FRAME_PREFIX = "\tat ";
 
-  XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+  private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
   public static void main(String[] args) throws IOException {
+    if (args.length != 1) {
+      System.err.println("Usage: java AntXmlParser path/to/results.xml");
+      System.exit(1);
+    }
     String path = args[0];
-    List<TestSuite> testSuites = new AntXmlParser()
+    ImmutableList<TestSuite> testSuites = new AntXmlParser()
         .parse(new FileInputStream(path), UTF_8);
     for (TestSuite testSuite : testSuites) {
       TextFormat.print(testSuite, System.out);
     }
   }
 
-  public List<TestSuite> parse(InputStream in, Charset encoding) {
-    List<TestSuite> testSuites = new ArrayList<>();
+  /**
+   * Returns the list of {@link TestSuite} objects parsed from the Ant XML format input stream.
+   */
+  public ImmutableList<TestSuite> parse(InputStream in, Charset encoding) {
     try {
       XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(in, encoding.name());
-      while (xmlStreamReader.hasNext()) {
-        int next = xmlStreamReader.next();
-        if (next == XMLStreamConstants.END_DOCUMENT) {
-          break;
-        }
-        if (!xmlStreamReader.hasName()) {
-          continue;
-        }
-        switch (xmlStreamReader.getName().toString()) {
-          case "testsuites":
-            parseSuites(xmlStreamReader, testSuites);
+      try {
+        while (xmlStreamReader.hasNext()) {
+          int next = xmlStreamReader.next();
+          if (next == XMLStreamConstants.END_DOCUMENT) {
             break;
-          case "testsuite":
-            parseSuite(xmlStreamReader, testSuites);
-            break;
-          default:
+          }
+          if (!xmlStreamReader.hasName()) {
+            continue;
+          }
+          switch (xmlStreamReader.getName().toString()) {
+            case "testsuites":
+              return parseSuites(xmlStreamReader);
+            case "testsuite":
+              return ImmutableList.of(parseSuite(xmlStreamReader));
+          }
         }
+      } finally {
+        xmlStreamReader.close();
       }
-
     } catch (XMLStreamException e) {
       throw new RuntimeException(e);
     }
-
-    return testSuites;
+    throw new RuntimeException("No testsuites or testsuite element found.");
   }
 
-  private void parseSuites(XMLStreamReader xmlStreamReader,
-      List<TestSuite> testSuites) throws XMLStreamException {
+  private ImmutableList<TestSuite> parseSuites(XMLStreamReader xmlStreamReader)
+      throws XMLStreamException {
     String tagName = null;
+    ImmutableList.Builder<TestSuite> testSuites = ImmutableList.builder();
     do {
       xmlStreamReader.next();
       if (!xmlStreamReader.hasName()) {
@@ -85,15 +92,15 @@ public class AntXmlParser {
       if (xmlStreamReader.isStartElement()) {
         switch (tagName) {
           case "testsuite":
-            parseSuite(xmlStreamReader, testSuites);
+            testSuites.add(parseSuite(xmlStreamReader));
             break;
         }
       }
     } while (!xmlStreamReader.isEndElement() || !"testsuites".equals(tagName));
+    return testSuites.build();
   }
 
-  private void parseSuite(XMLStreamReader xmlStreamReader,
-      List<TestSuite> testSuites) throws XMLStreamException {
+  private TestSuite parseSuite(XMLStreamReader xmlStreamReader) throws XMLStreamException {
     TestSuite.Builder builder = TestSuite.newBuilder();
     for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
       String attributeValue = xmlStreamReader.getAttributeValue(i);
@@ -137,7 +144,7 @@ public class AntXmlParser {
         }
       }
     } while (!xmlStreamReader.isEndElement() || !"testsuite".equals(tagName));
-    testSuites.add(builder.build());
+    return builder.build();
   }
 
   private void parseProperties(XMLStreamReader xmlStreamReader, TestSuite.Builder suiteBuilder)

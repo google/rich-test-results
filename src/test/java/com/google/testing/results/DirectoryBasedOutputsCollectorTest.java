@@ -64,4 +64,25 @@ public class DirectoryBasedOutputsCollectorTest {
         .build();
     assertThat(testResults, is(expected));
   }
+
+  @Test
+  public void testSkipFilesWithXmlParseError() throws Exception {
+    Path root = Files.createDirectory(inMemFileSystem.getPath("/012345"));
+    write(root.resolve("malformed-xml.xml"), asList(
+        "<one>",
+        "</two"
+    ), UTF_8);
+    Path testXml = root.resolve("tests/target/surefire-reports/TEST-com.google.Something.xml");
+    Files.createDirectories(testXml.getParent());
+    write(testXml, asList(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>",
+        "<testsuite name=\"MyTest\">",
+        "</testsuite>"
+    ), UTF_8);
+    TestResults testResults = new DirectoryBasedOutputsCollector().parse(root);
+    TestResults expected = TestResults.newBuilder()
+        .addTestSuite(TestSuite.newBuilder().setName("MyTest"))
+        .build();
+    assertThat(testResults, is(expected));
+  }
 }

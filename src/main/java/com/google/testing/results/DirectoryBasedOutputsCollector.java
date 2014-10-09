@@ -12,11 +12,15 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.logging.Logger;
 
 /**
  * @author alexeagle@google.com (Alex Eagle)
  */
 public class DirectoryBasedOutputsCollector {
+  private final static Logger logger = Logger.getLogger(
+      DirectoryBasedOutputsCollector.class.getName());
+
   public static final Predicate<Path> LOOKS_LIKE_TEST_DIRECTORY = new Predicate<Path>() {
     @Override
     public boolean apply(Path path) {
@@ -44,15 +48,19 @@ public class DirectoryBasedOutputsCollector {
         }
         if (Iterables.any(file, LOOKS_LIKE_TEST_DIRECTORY) &&
             file.getFileName().toString().endsWith(".xml")) {
-          builder.addAllTestSuite(xmlParser.parse(Files.newInputStream(file), UTF_8));
+          try {
+            builder.addAllTestSuite(xmlParser.parse(Files.newInputStream(file), UTF_8));
+          } catch (XmlParseException xmlParseError) {
+            logger.warning(
+                "Failed to parse, file = [" + file + "], exc = [" + xmlParseError + "]");
+          }
         }
-
         return FileVisitResult.CONTINUE;
       }
 
       @Override
       public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        System.out.println("file = [" + file + "], exc = [" + exc + "]");
+        logger.warning("Failed to read, file = [" + file + "], exc = [" + exc + "]");
         return FileVisitResult.CONTINUE;
       }
 

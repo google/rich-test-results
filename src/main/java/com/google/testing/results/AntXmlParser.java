@@ -3,7 +3,6 @@ package com.google.testing.results;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Closeables;
 import com.google.protobuf.TextFormat;
 import com.google.testing.results.TestSuiteProto.Property.Builder;
 import com.google.testing.results.TestSuiteProto.StackTrace;
@@ -17,8 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -35,7 +32,7 @@ public class AntXmlParser {
 
   private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException, XmlParseException {
     if (args.length != 1) {
       System.err.println("Usage: java AntXmlParser path/to/results.xml");
       System.exit(1);
@@ -51,7 +48,8 @@ public class AntXmlParser {
   /**
    * Returns the list of {@link TestSuite} objects parsed from the Ant XML format input stream.
    */
-  public ImmutableList<TestSuite> parse(InputStream in, Charset encoding) {
+  public ImmutableList<TestSuite> parse(InputStream in, Charset encoding)
+      throws XmlParseException {
     try {
       XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(in, encoding.name());
       try {
@@ -74,9 +72,13 @@ public class AntXmlParser {
         xmlStreamReader.close();
       }
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      if (e.getLocation() != null) {
+        throw new XmlParseException(e.getMessage(), e);
+      } else {
+        throw new RuntimeException(e);
+      }
     }
-    throw new RuntimeException("No testsuites or testsuite element found.");
+    throw new XmlParseException("No testsuites or testsuite element found.");
   }
 
   private ImmutableList<TestSuite> parseSuites(XMLStreamReader xmlStreamReader)

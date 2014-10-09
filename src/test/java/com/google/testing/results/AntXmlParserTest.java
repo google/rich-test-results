@@ -12,7 +12,9 @@ import com.google.testing.results.TestSuiteProto.TestSuite;
 
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -23,7 +25,7 @@ import java.util.List;
  */
 @RunWith(JUnit4.class)
 public class AntXmlParserTest {
-
+  @Rule public ExpectedException thrown = ExpectedException.none();
   AntXmlParser parser;
 
   @Before
@@ -360,4 +362,17 @@ public class AntXmlParserTest {
     assertThat(actual).has().exactly(testSuite);
   }
 
+  @Test
+  public void shouldRaiseXmlParseErrorWhenNoTestSuiteFound() throws Exception {
+    thrown.expect(XmlParseException.class);
+    parser.parse(
+        getClass().getResourceAsStream("/no-testsuite.xml"), UTF_8);
+  }
+
+  @Test
+  public void shouldRaiseXmlParseErrorWithMalformedXMLInput() throws Exception {
+    thrown.expect(XmlParseException.class);
+    parser.parse(
+        getClass().getResourceAsStream("/malformed-xml.xml"), UTF_8);
+  }
 }

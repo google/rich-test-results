@@ -1,0 +1,6 @@
+The Rich Test Results library parses JUnit XML files.
+
+To submit a change for code review, push to:
+git push origin HEAD:refs/for/master
+
+or HEAD:refs/for/some-branch if you are pushing to a non-master branch.

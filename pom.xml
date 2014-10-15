@@ -57,6 +57,7 @@
       <groupId>com.google.truth</groupId>
       <artifactId>truth</artifactId>
       <version>0.23</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

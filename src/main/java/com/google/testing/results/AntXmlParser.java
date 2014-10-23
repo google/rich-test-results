@@ -46,7 +46,15 @@ import javax.xml.stream.XMLStreamReader;
 public class AntXmlParser {
   private static final String JAVA_STACK_FRAME_PREFIX = "\tat ";
 
-  private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+  XMLInputFactory xmlInputFactory = createFactory();
+
+  private XMLInputFactory createFactory() {
+    XMLInputFactory factory = XMLInputFactory.newInstance();
+    // Prevent XXE (Xml eXternal Entity) attacks
+    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    factory.setProperty("http://java.sun.com/xml/stream/properties/ignore-external-dtd", true);
+    return factory;
+  }
 
   public static void main(String[] args) throws IOException, XmlParseException {
     if (args.length != 1) {

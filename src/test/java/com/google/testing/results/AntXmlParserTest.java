@@ -391,4 +391,14 @@ public class AntXmlParserTest {
     parser.parse(
         getClass().getResourceAsStream("/malformed-xml.xml"), UTF_8);
   }
+
+  @Test
+  public void shouldPreventXXEAttacks() throws Exception {
+    // If the attack is successful, the parser will fail with
+    // ParseError at [row,col]:[22,15]
+    // Message: /does-not-exist (No such file or directory)
+    parser.parse(
+        getClass().getResourceAsStream("/xxe_attack.xml"), UTF_8);
+
+  }
 }

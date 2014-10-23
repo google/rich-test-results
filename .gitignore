@@ -1,0 +1,6 @@
+# core developers use IntelliJ
+.idea/**
+*.iml
+
+# Don't look at maven generated stuff
+target/**

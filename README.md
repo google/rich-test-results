@@ -4,7 +4,7 @@ static analysis tools, compilers, and various flavors of automated tests,
 including browser and mobile tests.
 
 Since this format will start out without adoption, we must interoperate with
-existing formats. The xUnit XML format originally created by the Ant Junit
+existing formats. The xUnit XML format originally created by the Ant JUnit
 task is the de-facto industry standard today, so we provide a robust parser
 for it. We intend to add more parsers as we determine that other formats merit
 support.

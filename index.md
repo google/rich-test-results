@@ -18,7 +18,7 @@ build is configured, or how to run one part of the test in isolation.
 Recording detailed information from the test helps to document
 the wiring of the test fixtures and testing environment.
 
-## Design
+# Design (in progress)
 To understand a test result, users need information from many
 sources, such as the continuous build,
 the build system, the test runner, the test itself, and library code
@@ -40,7 +40,7 @@ At a high level, we have some guiding design principles:
 * __Cross-platform.__ We don't make any assumptions about the
  languages or environments where the test executes.
  
-### Summary
+## Summary
 
 __Producers__ have test result data to write.
 
@@ -62,12 +62,12 @@ retried. A consumer might also be a producer, for example it might
 read all the result data and then re-publish it to a hosted testcase
 viewing service.
 
-### Producers
+## Producers
 A producer has data to write. A typical producer is an existing
 tool such as Maven, Gradle, Espresso, Junit, Jenkins, Travis,
 etc. It might produce screenshots, 
 
-### The Environment
+## The Environment
 We define a number of environment variables which configure
 the producers. If the environment is present, then the producer
 should use that configuration, otherwise it is responsible for
@@ -75,7 +75,7 @@ creating the environment. Either way, the environment must be
 propagated, otherwise later producers in the call chain will
 not have outputs recorded.
 
-### The Filesystem
+## The Filesystem
 This might be configured as a local filesystem, however, that has
 the limitation of running all the test processes on one machine.
 If the test makes a service call to a process running somewhere
@@ -95,7 +95,7 @@ filesystem types. However, this option requires the most
 sophisticated configuration work.
 
 
-### The MANIFEST file
+## The MANIFEST file
 The MANIFEST is written by a producer to annotate other output
 files it wrote. It contains metadata about the file, like its
 MIME type, a short description for showing in a UI. Each entry
@@ -103,7 +103,8 @@ in the MANIFEST needs to point to the file it annotates,
 using a path relative to the location of the MANIFEST.
 It might also provide more context about the file, for example
 it might associate a screenshot with the particular test method
-that wrote it.
+that wrote it. It could also indicate what viewer application
+is best suited for displaying the data.
 
 There may be one or more MANIFEST files. Each one is treated
 as one shard of the metadata produced by the whole test.
@@ -113,9 +114,32 @@ The format is still undetermined. We need to select something
 with a good extensibility story, and wide language support,
 such as YAML.
 
-### Consumers
+## Consumers
 A Consumer could be a website or application which displays
 some or all of the data produced by a test. For example, if
 the test produces a [har file](http://en.wikipedia.org/wiki/.har)
 then the consumer could be the
 [har viewer application](http://www.janodvarko.cz/har/viewer/).
+
+# Formats
+rich-test-results is a meta-format, and supports a number of test result
+formats. Each is associated with a single mime type.
+
+__Formats supported now__
+
+* [XUnit XML file](xunitxml)
+
+__Proposed__
+
+* Timestamp-indexed logs
+* [Source code analysis](sourceanalysis)
+* Image files (jpg, gif, etc)
+* Video files (m4v, etc)
+* Image diff
+* Text diff
+* HTTP Archive (har)
+* Metrics
+* Binary (opaque bytes)
+
+More formats may be added in the future. The process to follow is
+not yet designed.

@@ -4,6 +4,8 @@ layout: master
 ---
 
 # About
+__THIS PROJECT IS STILL IN EARLY DEVELOPMENT. It is not ready to use.__
+
 rich-test-results aims to provide an interoperable format for
 representing all the results of a test execution, making it
 much easier to reason about failures and identify the root cause.
@@ -117,10 +119,12 @@ such as YAML.
 ## Consumers
 A Consumer could be a website or application which displays
 some or all of the data produced by a test. For example, if
-the test produces a [har file](http://en.wikipedia.org/wiki/.har)
-then the consumer could be the
-[har viewer application](http://www.janodvarko.cz/har/viewer/).
+the test produces a [har file][] then the consumer could be the
+[har viewer application][].
 
+[har file]: http://en.wikipedia.org/wiki/.har
+[har viewer application]: http://www.janodvarko.cz/har/viewer/
+ 
 # Formats
 rich-test-results is a meta-format, and supports a number of test result
 formats. Each is associated with a single mime type.
@@ -138,7 +142,7 @@ __Proposed__
 * Image diff
 * Text diff
 * HTTP Archive (har)
-* Metrics
+* Metrics (CPU, memory, battery usage)
 * Binary (opaque bytes)
 
 More formats may be added in the future. The process to follow is

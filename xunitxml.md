@@ -10,6 +10,8 @@ by test cases which failed or errored.
 
 There is no official schema. There is an unofficial [xsd schema][] available.
 
+[xsd schema]: http://windyroad.com.au/dl/Open%20Source/JUnit.xsd
+
 __Support by producers__
 
 Many testing tools produce this format. It has been the de-facto industry
@@ -21,8 +23,11 @@ rich-test-results includes a robust STaX parser for the XUnit XML format. The
 result is currently only represented as a [protocol buffer][].
 You may use it as a library, or as a standalone Java program.
 
+[protocol buffer]: https://developers.google.com/protocol-buffers/
+
 Example:
-```bash
+
+{% highlight bash %}
 $ export REPO=~/.m2/repository
 $ java -cp $REPO/com/google/testing/results/results/0.1-SNAPSHOT/results-0.1-SNAPSHOT.jar:$REPO/com/google/protobuf/protobuf-java/2.6.1/protobuf-java-2.6.1.jar:$REPO/com/google/guava/guava/17.0/guava-17.0.jar \
   com.google.testing.results.AntXmlParser \
@@ -38,4 +43,4 @@ property {
   value: "Java(TM) SE Runtime Environment"
 }
 [ ... ]
-```
+{% endhighlight %}

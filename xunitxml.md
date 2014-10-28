@@ -23,6 +23,19 @@ You may use it as a library, or as a standalone Java program.
 
 Example:
 ```bash
-$ java -cp path/to/rich-test-results.jar \
-  com.google.testing.results.AntXmlParser path/to/results.xml
+$ export REPO=~/.m2/repository
+$ java -cp $REPO/com/google/testing/results/results/0.1-SNAPSHOT/results-0.1-SNAPSHOT.jar:$REPO/com/google/protobuf/protobuf-java/2.6.1/protobuf-java-2.6.1.jar:$REPO/com/google/guava/guava/17.0/guava-17.0.jar \
+  com.google.testing.results.AntXmlParser \
+  target/surefire-reports/TEST-com.google.testing.results.AntXmlParserTest.xml
+name: "com.google.testing.results.AntXmlParserTest"
+elapsed_time_millis: 178
+total_count: 11
+failure_count: 0
+error_count: 0
+skipped_count: 1
+property {
+  name: "java.runtime.name"
+  value: "Java(TM) SE Runtime Environment"
+}
+[ ... ]
 ```

@@ -15,5 +15,5 @@ If you're a developer and want to contribute, first read our
 Read [developing rich-test-results][].
 
 [documentation]: http://google.github.io/rich-test-results/
-[contributor doc]: CONTRIBUTORS.md 
+[contributor doc]: CONTRIBUTING.md 
 [developing rich-test-results]: HOWTO.md

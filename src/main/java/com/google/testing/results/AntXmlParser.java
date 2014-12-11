@@ -23,6 +23,7 @@ import com.google.protobuf.TextFormat;
 import com.google.testing.results.TestSuiteProto.Property.Builder;
 import com.google.testing.results.TestSuiteProto.StackTrace;
 import com.google.testing.results.TestSuiteProto.TestCase;
+import com.google.testing.results.TestSuiteProto.TestStatus;
 import com.google.testing.results.TestSuiteProto.TestSuite;
 
 import java.io.BufferedReader;
@@ -208,6 +209,7 @@ public class AntXmlParser {
   private void parseTestCase(XMLStreamReader xmlStreamReader, TestSuite.Builder suiteBuilder)
       throws XMLStreamException {
     TestCase.Builder builder = suiteBuilder.addTestCaseBuilder();
+    builder.setStatus(TestStatus.PASSED);
     for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
       String attributeValue = xmlStreamReader.getAttributeValue(i);
       switch (xmlStreamReader.getAttributeName(i).toString()) {
@@ -233,14 +235,36 @@ public class AntXmlParser {
       if (xmlStreamReader.isStartElement()) {
         switch (tagName) {
           case "failure":
+            builder.setStatus(TestStatus.FAILED);
             parseStackTrace(xmlStreamReader, builder.addFailureBuilder(), "failure");
             break;
           case "error":
+            builder.setStatus(TestStatus.ERROR);
             parseStackTrace(xmlStreamReader, builder.getErrorBuilder(), "error");
+            break;
+          case "skipped":
+            builder.setStatus(TestStatus.SKIPPED);
+            builder.setSkippedMessage(getElementContent(xmlStreamReader, "skipped"));
             break;
         }
       }
     } while (!xmlStreamReader.isEndElement() || !"testcase".equals(tagName));
+  }
+
+  private String getElementContent(XMLStreamReader xmlStreamReader, String elementName)
+      throws XMLStreamException {
+    String tagName = null;
+    StringBuilder stringBuilder = new StringBuilder();
+    do {
+      xmlStreamReader.next();
+      if (xmlStreamReader.hasName()) {
+        tagName = xmlStreamReader.getName().toString();
+      } else if (xmlStreamReader.isCharacters()) {
+        String text = xmlStreamReader.getText();
+        stringBuilder.append(text);
+      }
+    } while (!xmlStreamReader.isEndElement() || !elementName.equals(tagName));
+    return stringBuilder.toString();
   }
 
   private void parseStackTrace(XMLStreamReader xmlStreamReader,
@@ -257,19 +281,8 @@ public class AntXmlParser {
       }
     }
 
-    String tagName = null;
     //TODO(pepstein): Avoid holding entire stack trace in memory.
-    StringBuilder stringBuilder = new StringBuilder();
-    do {
-      xmlStreamReader.next();
-      if (xmlStreamReader.hasName()) {
-        tagName = xmlStreamReader.getName().toString();
-      } else if (xmlStreamReader.isCharacters()) {
-        String text = xmlStreamReader.getText();
-        stringBuilder.append(text);
-      }
-    } while (!xmlStreamReader.isEndElement() || !elementType.equals(tagName));
-    String stackTrace = stringBuilder.toString();
+    String stackTrace = getElementContent(xmlStreamReader, elementType);
 
     BufferedReader reader = new BufferedReader(new StringReader(stackTrace));
     try {

@@ -49,7 +49,26 @@ message TestCase {
 
     repeated StackTrace failure = 5; // An assertion failed.
     optional StackTrace error = 6;   // An unexpected exception was thrown
+
+    optional TestStatus status = 7;
+    optional string skipped_message = 8; // Message about why the test was skipped
 }
+
+// The status of a test case.
+enum TestStatus {
+    // Test passed.
+    PASSED = 0;
+
+    // Test failed.
+    FAILED = 1;
+
+    // Test encountered an error
+    ERROR = 2;
+
+    // Test skipped
+    SKIPPED = 3;
+}
+
 
 // In Ant's junit task XML format, this message represents the nodes
 // <failure message="expected:&lt;1&gt; but was:&lt;2&gt;" type="java.lang.AssertionError">

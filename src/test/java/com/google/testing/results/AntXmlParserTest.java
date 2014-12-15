@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright 2014 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +25,7 @@ import com.google.testing.results.TestSuiteProto.Property;
 import com.google.testing.results.TestSuiteProto.StackContent;
 import com.google.testing.results.TestSuiteProto.StackTrace;
 import com.google.testing.results.TestSuiteProto.TestCase;
+import com.google.testing.results.TestSuiteProto.TestStatus;
 import com.google.testing.results.TestSuiteProto.TestSuite;
 
 import org.junit.Before;
@@ -66,6 +68,32 @@ public class AntXmlParserTest {
             .setName("sun.cpu.isalist").setValue(""))
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(17L)
+            .setStatus(TestStatus.PASSED)
+            .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
+            .setName("shouldMatchSingleConstructor"))
+        .build();
+    assertThat(actual).has().exactly(testSuite);
+  }
+
+  @Test
+  public void shouldParseSkippedTest() throws Exception {
+    List<TestSuite> actual = parser.parse(
+        getClass().getResourceAsStream("/skipped.xml"), UTF_8);
+    TestSuite testSuite = TestSuite.newBuilder()
+        .setName("com.google.errorprone.matchers.ConstructorOfClassTest")
+        .setTotalCount(8)
+        .setFailureCount(1)
+        .setErrorCount(2)
+        .setSkippedCount(4)
+        .setElapsedTimeMillis(1068L)
+        .addProperty(Property.newBuilder()
+            .setName("java.runtime.name").setValue("Java(TM) SE Runtime Environment"))
+        .addProperty(Property.newBuilder()
+            .setName("sun.cpu.isalist").setValue(""))
+        .addTestCase(TestCase.newBuilder()
+            .setElapsedTimeMillis(0L)
+            .setStatus(TestStatus.SKIPPED)
+            .setSkippedMessage("the test is skipped.")
             .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
             .setName("shouldMatchSingleConstructor"))
         .build();
@@ -89,6 +117,7 @@ public class AntXmlParserTest {
             .setName("sun.cpu.isalist").setValue(""))
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(17L)
+            .setStatus(TestStatus.PASSED)
             .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
             .setName("shouldMatchSingleConstructor"))
         .build();
@@ -112,6 +141,7 @@ public class AntXmlParserTest {
         .setElapsedTimeMillis(6L)
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(6L)
+            .setStatus(TestStatus.FAILED)
             .setClassName("com.google.SimpleTest")
             .setName("testThatFails")
             .addFailure(StackTrace.newBuilder()
@@ -140,6 +170,7 @@ public class AntXmlParserTest {
                     + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"))))
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(0L)
+            .setStatus(TestStatus.PASSED)
             .setClassName("com.google.SimpleTest")
             .setName("testThatPasses"))
         .build();
@@ -164,6 +195,7 @@ public class AntXmlParserTest {
         .setElapsedTimeMillis(7L)
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(7L)
+            .setStatus(TestStatus.ERROR)
             .setClassName("com.google.ExceptionThrownTest")
             .setName("testDivision")
             .setError(StackTrace.newBuilder()
@@ -239,6 +271,7 @@ public class AntXmlParserTest {
         .setElapsedTimeMillis(7L)
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(7L)
+            .setStatus(TestStatus.ERROR)
             .setClassName("com.google.NestedExceptionThrownTest")
             .setName("testDivision")
             .setError(expectedError))
@@ -310,6 +343,7 @@ public class AntXmlParserTest {
         .setElapsedTimeMillis(152L)
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(152L)
+            .setStatus(TestStatus.ERROR)
             .setClassName("com.google.GuiceExceptionTest")
             .setName("testGuiceException")
             .setError(expectedError))
@@ -330,6 +364,7 @@ public class AntXmlParserTest {
         .setElapsedTimeMillis(7L)
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(7L)
+            .setStatus(TestStatus.ERROR)
             .setClassName("com.google.ExceptionThrownTest")
             .setName("testDivision")
             .setError(StackTrace.newBuilder()
@@ -372,6 +407,7 @@ public class AntXmlParserTest {
             .setName("sun.cpu.isalist").setValue(""))
         .addTestCase(TestCase.newBuilder()
             .setElapsedTimeMillis(17L)
+            .setStatus(TestStatus.PASSED)
             .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
             .setName("shouldMatchSingleConstructor"))
         .build();

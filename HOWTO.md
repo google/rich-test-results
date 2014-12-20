@@ -29,7 +29,7 @@ steps required:
           </toolchain>
         </toolchains>
 
-1. If you are unsing IntelliJ install the `Maven Integration` plugin and
+1. If you are using IntelliJ install the `Maven Integration` plugin and
    in `Project Settings > Maven` set the `Maven Home Directory` to wherever
    you put maven in step 1 (it should point to the directory which contains
    the `bin` directory).

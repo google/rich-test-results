@@ -79,7 +79,9 @@ message StackTrace {
     optional string exception_type = 2;
     repeated Property unrecognized_attributes = 3;
 
+    // Experimental, sometimes the stack trace parsing might not work.
     repeated StackContent stack_content = 4;
+    optional string content = 5;
 }
 
 // In Ant's junit task XML format, this message represents a line within a <failure> such as

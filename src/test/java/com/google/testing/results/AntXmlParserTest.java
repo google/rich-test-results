@@ -147,6 +147,14 @@ public class AntXmlParserTest {
             .addFailure(StackTrace.newBuilder()
                 .setExceptionMessage("expected:<1> but was:<2>")
                 .setExceptionType("java.lang.AssertionError")
+                .setContent("java.lang.AssertionError: expected:<1> but was:<2>\n"
+                    + "\tat org.junit.Assert.fail(Assert.java:88)\n"
+                    + "\tat org.junit.Assert.failNotEquals(Assert.java:743)\n"
+                    + "\tat org.junit.Assert.assertEquals(Assert.java:118)\n"
+                    + "\tat org.junit.Assert.assertEquals(Assert.java:555)\n"
+                    + "\tat org.junit.Assert.assertEquals(Assert.java:542)\n"
+                    + "\tat com.google.SimpleTest.testThatFails(SimpleTest.java:11)\n"
+                    + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n")
                 .addStackContent(text(
                     "java.lang.AssertionError: expected:<1> but was:<2>\n"
                         + "\tat org.junit.Assert.fail("))
@@ -201,6 +209,13 @@ public class AntXmlParserTest {
             .setError(StackTrace.newBuilder()
                 .setExceptionMessage("/ by zero")
                 .setExceptionType("java.lang.ArithmeticException")
+                .setContent("java.lang.ArithmeticException: / by zero\n"
+                    + "\tat com.google.ExceptionThrownTest.testDivision(ExceptionThrownTest.java:11)\n"
+                    + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"
+                    + "\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)\n"
+                    + "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n"
+                    + "\tat java.lang.reflect.Method.invoke(Method.java:606)\n"
+                    + "\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:47)\n")
                 .addStackContent(text("java.lang.ArithmeticException: / by zero\n"
                     + "\tat com.google.ExceptionThrownTest.testDivision("))
                 .addStackContent(codeRef(
@@ -238,6 +253,15 @@ public class AntXmlParserTest {
     StackTrace.Builder expectedError = StackTrace.newBuilder()
         .setExceptionMessage("Division operation failed")
         .setExceptionType("java.lang.RuntimeException")
+        .setContent("java.lang.RuntimeException: Division operation failed\n"
+            + "\tat com.google.NestedExceptionThrownTest.testDivision(NestedExceptionThrownTest.java:14)\n"
+            + "\tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n"
+            + "\tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)\n"
+            + "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n"
+            + "\tat java.lang.reflect.Method.invoke(Method.java:606)\n"
+            + "Caused by: java.lang.ArithmeticException: / by zero\n"
+            + "\tat com.google.NestedExceptionThrownTest.testDivision(NestedExceptionThrownTest.java:12)\n"
+            + "\t... 4 more\n")
         .addStackContent(text("java.lang.RuntimeException: Division operation failed\n"
             + "\tat com.google.NestedExceptionThrownTest.testDivision("))
         .addStackContent(codeRef(
@@ -295,6 +319,22 @@ public class AntXmlParserTest {
             + "\n"
             + "2 errors").replaceAll("\n", " "))
         .setExceptionType("com.google.inject.CreationException")
+        .setContent("com.google.inject.CreationException: Guice creation errors:\n"
+            + "\n"
+            + "1) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$A() was bound.\n"
+            + "  at com.google.GuiceExceptionTest$MyModule.provideA(GuiceExceptionTest.java:44)\n"
+            + "\n"
+            + "2) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$B() was bound.\n"
+            + "  at com.google.GuiceExceptionTest$MyModule.provideB(GuiceExceptionTest.java:49)\n"
+            + "\n"
+            + "2 errors\n"
+            + "\tat com.google.inject.internal.Errors.throwCreationExceptionIfErrorsExist(Errors.java:435)\n"
+            + "\tat com.google.inject.internal.InternalInjectorCreator.initializeStatically(InternalInjectorCreator.java:154)\n"
+            + "\tat com.google.inject.internal.InternalInjectorCreator.build(InternalInjectorCreator.java:106)\n"
+            + "\tat com.google.inject.Guice.createInjector(Guice.java:95)\n"
+            + "\tat com.google.inject.Guice.createInjector(Guice.java:72)\n"
+            + "\tat com.google.inject.Guice.createInjector(Guice.java:62)\n"
+            + "\tat com.google.GuiceExceptionTest.testGuiceException(GuiceExceptionTest.java:21)")
         .addStackContent(text("com.google.inject.CreationException: Guice creation errors:\n"
             + "\n"
             + "1) No implementation for java.lang.Integer annotated with @com.google.GuiceExceptionTest$A() was bound.\n"
@@ -370,6 +410,9 @@ public class AntXmlParserTest {
             .setError(StackTrace.newBuilder()
                 .setExceptionMessage("/ by zero")
                 .setExceptionType("java.lang.ArithmeticException")
+                .setContent("java.lang.ArithmeticException: / by zero\n"
+                    + "\tat java.lang.reflect.Method.invoke\n"
+                    + "\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:47)\n")
                 .addStackContent(text("java.lang.ArithmeticException: / by zero\n"
                     + "\tat java.lang.reflect.Method.invoke\n"
                     + "\tat org.junit.runners.model.FrameworkMethod$1.runReflectiveCall("))
@@ -422,8 +465,17 @@ public class AntXmlParserTest {
   }
 
   @Test
+  public void shouldRaiseXmlParseErrorWhenTestSuiteContainsTestSuite() throws Exception {
+    thrown.expect(XmlParseException.class);
+    thrown.expectMessage("Element <testsuite> should not contain element <testsuite>.");
+    parser.parse(
+        getClass().getResourceAsStream("/unsupported_testsuite_element.xml"), UTF_8);
+  }
+
+  @Test
   public void shouldRaiseXmlParseErrorWithMalformedXMLInput() throws Exception {
     thrown.expect(XmlParseException.class);
+    thrown.expectMessage("Element <root> should not contain element <one>.");
     parser.parse(
         getClass().getResourceAsStream("/malformed-xml.xml"), UTF_8);
   }

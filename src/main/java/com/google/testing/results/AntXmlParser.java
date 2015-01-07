@@ -86,11 +86,16 @@ public class AntXmlParser {
           if (!xmlStreamReader.hasName()) {
             continue;
           }
-          switch (xmlStreamReader.getName().toString()) {
-            case "testsuites":
-              return parseSuites(xmlStreamReader);
-            case "testsuite":
-              return ImmutableList.of(parseSuite(xmlStreamReader));
+          String tagName = xmlStreamReader.getName().toString();
+          if (xmlStreamReader.isStartElement()) {
+            switch (tagName) {
+              case "testsuites":
+                return parseSuites(xmlStreamReader);
+              case "testsuite":
+                return ImmutableList.of(parseSuite(xmlStreamReader));
+              default:
+                handleUnsupportedElement("root", tagName);
+            }
           }
         }
       } finally {
@@ -107,7 +112,7 @@ public class AntXmlParser {
   }
 
   private ImmutableList<TestSuite> parseSuites(XMLStreamReader xmlStreamReader)
-      throws XMLStreamException {
+      throws XMLStreamException, XmlParseException {
     String tagName = null;
     ImmutableList.Builder<TestSuite> testSuites = ImmutableList.builder();
     do {
@@ -121,13 +126,16 @@ public class AntXmlParser {
           case "testsuite":
             testSuites.add(parseSuite(xmlStreamReader));
             break;
+          default:
+            handleUnsupportedElement("testsuites", tagName);
         }
       }
     } while (!xmlStreamReader.isEndElement() || !"testsuites".equals(tagName));
     return testSuites.build();
   }
 
-  private TestSuite parseSuite(XMLStreamReader xmlStreamReader) throws XMLStreamException {
+  private TestSuite parseSuite(XMLStreamReader xmlStreamReader)
+      throws XMLStreamException, XmlParseException {
     TestSuite.Builder builder = TestSuite.newBuilder();
     for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
       String attributeValue = xmlStreamReader.getAttributeValue(i);
@@ -168,6 +176,14 @@ public class AntXmlParser {
           case "testcase":
             parseTestCase(xmlStreamReader, builder);
             break;
+          case "system-out":
+            skipElement(xmlStreamReader, "system-out");
+            break;
+          case "system-err":
+            skipElement(xmlStreamReader, "system-err");
+            break;
+          default:
+            handleUnsupportedElement("testsuite", tagName);
         }
       }
     } while (!xmlStreamReader.isEndElement() || !"testsuite".equals(tagName));
@@ -207,7 +223,7 @@ public class AntXmlParser {
   }
 
   private void parseTestCase(XMLStreamReader xmlStreamReader, TestSuite.Builder suiteBuilder)
-      throws XMLStreamException {
+      throws XMLStreamException, XmlParseException {
     TestCase.Builder builder = suiteBuilder.addTestCaseBuilder();
     builder.setStatus(TestStatus.PASSED);
     for (int i = 0; i < xmlStreamReader.getAttributeCount(); i++) {
@@ -246,9 +262,35 @@ public class AntXmlParser {
             builder.setStatus(TestStatus.SKIPPED);
             builder.setSkippedMessage(getElementContent(xmlStreamReader, "skipped"));
             break;
+          case "system-out":
+            skipElement(xmlStreamReader, "system-out");
+            break;
+          case "system-err":
+            skipElement(xmlStreamReader, "system-err");
+            break;
+          default:
+            handleUnsupportedElement("testcase", tagName);
         }
       }
     } while (!xmlStreamReader.isEndElement() || !"testcase".equals(tagName));
+  }
+
+  private void skipElement(XMLStreamReader xmlStreamReader, String elementName)
+      throws XMLStreamException, XmlParseException {
+    String tagName = null;
+    do {
+      xmlStreamReader.next();
+      if (!xmlStreamReader.hasName()) {
+        continue;
+      }
+      tagName = xmlStreamReader.getName().toString();
+    } while (!xmlStreamReader.isEndElement() || !elementName.equals(tagName));
+  }
+
+  private TestSuite handleUnsupportedElement(String elementName, String childElement)
+      throws XmlParseException {
+    throw new XmlParseException(
+        "Element <" + elementName + "> should not contain element <" + childElement + ">.");
   }
 
   private String getElementContent(XMLStreamReader xmlStreamReader, String elementName)
@@ -283,6 +325,7 @@ public class AntXmlParser {
 
     //TODO(pepstein): Avoid holding entire stack trace in memory.
     String stackTrace = getElementContent(xmlStreamReader, elementType);
+    stackTraceBuilder.setContent(stackTrace);
 
     BufferedReader reader = new BufferedReader(new StringReader(stackTrace));
     try {

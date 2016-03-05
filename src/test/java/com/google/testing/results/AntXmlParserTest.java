@@ -491,7 +491,7 @@ public class AntXmlParserTest {
   }
 
   @Test
-  public void shouldStracktraceWithoutPackageName() throws Exception {
+  public void shouldParseStackTraceWithoutPackageName() throws Exception {
     List<TestSuite> actual = parser.parse(
         getClass().getResourceAsStream("/no-package-name-stacktrace.xml"), UTF_8);
     TestSuite testSuite = TestSuite.newBuilder()

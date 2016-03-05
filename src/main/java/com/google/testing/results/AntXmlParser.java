@@ -361,14 +361,20 @@ public class AntXmlParser {
         return;
       }
 
+      String path;
       String classAndMethod = line.substring(JAVA_STACK_FRAME_PREFIX.length(), openParen);
       String fullyQualifiedClassname = classAndMethod
           .substring(0, classAndMethod.lastIndexOf('.'));
-      String packageName = fullyQualifiedClassname
-          .substring(0, fullyQualifiedClassname.lastIndexOf("."));
-      String directory = packageName.replaceAll("\\.", File.separator);
       String filename = fileAndLine.substring(0, colon);
-      String path = directory + File.separator + filename;
+      if (fullyQualifiedClassname.contains(".")) {
+        String packageName =
+            fullyQualifiedClassname.substring(0, fullyQualifiedClassname.lastIndexOf("."));
+        String directory = packageName.replaceAll("\\.", File.separator);
+        path = directory + File.separator + filename;
+      } else {
+        path = filename;
+      }
+
       int lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
 
       textBuilder.append(line.substring(0, openParen + 1));

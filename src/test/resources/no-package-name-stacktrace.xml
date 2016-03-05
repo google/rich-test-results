@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="" tests="1" failures="1" errors="0" skipped="0" time="0.027" timestamp="2016-03-04T19:24:45" hostname="localhost">
+    <properties />
+    <testcase name="testSomeCoolTesting" classname="ApplicationTest" time="0.0">
+        <failure>java.lang.NullPointerException: Attempt to invoke virtual method 'void android.app.Instrumentation.setInTouchMode(boolean)' on a null object reference
+	at android.test.ActivityInstrumentationTestCase2.getActivity(ActivityInstrumentationTestCase2.java:100)
+	at ApplicationTest.testSomeCoolTesting(ApplicationTest.java:25)
+</failure>
+    </testcase>
+</testsuite>

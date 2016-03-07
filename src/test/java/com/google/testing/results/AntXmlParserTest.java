@@ -489,4 +489,45 @@ public class AntXmlParserTest {
         getClass().getResourceAsStream("/xxe_attack.xml"), UTF_8);
 
   }
+
+  @Test
+  public void shouldParseStackTraceWithoutPackageName() throws Exception {
+    List<TestSuite> actual = parser.parse(
+        getClass().getResourceAsStream("/no-package-name-stacktrace.xml"), UTF_8);
+    TestSuite testSuite = TestSuite.newBuilder()
+        .setName("")
+        .setTotalCount(1)
+        .setFailureCount(1)
+        .setErrorCount(0)
+        .setSkippedCount(0)
+        .setElapsedTimeMillis(27L)
+        .addTestCase(TestCase.newBuilder()
+            .setElapsedTimeMillis(0L)
+            .setStatus(TestStatus.FAILED)
+            .setClassName("ApplicationTest")
+            .setName("testSomeCoolTesting")
+            .addFailure(StackTrace.newBuilder()
+                .setContent("java.lang.NullPointerException: Attempt to invoke virtual method "
+                    + "'void android.app.Instrumentation.setInTouchMode(boolean)' "
+                    + "on a null object reference\n"
+                    + "\tat android.test.ActivityInstrumentationTestCase2.getActivity"
+                    + "(ActivityInstrumentationTestCase2.java:100)\n"
+                    + "\tat ApplicationTest.testSomeCoolTesting(ApplicationTest.java:25)\n")
+                .addStackContent(text("java.lang.NullPointerException: Attempt to invoke virtual "
+                    + "method 'void android.app.Instrumentation.setInTouchMode(boolean)' on "
+                    + "a null object reference\n\tat "
+                    + "android.test.ActivityInstrumentationTestCase2.getActivity("))
+                .addStackContent(codeRef(
+                    "ActivityInstrumentationTestCase2.java:100",
+                    "android/test/ActivityInstrumentationTestCase2.java",
+                    100))
+                .addStackContent(text(")\n\tat ApplicationTest.testSomeCoolTesting("))
+                .addStackContent(codeRef(
+                    "ApplicationTest.java:25",
+                    "ApplicationTest.java",
+                    25))
+                .addStackContent(text(")\n"))))
+        .build();
+    assertThat(actual).has().exactly(testSuite);
+  }
 }

@@ -22,12 +22,10 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import com.google.jimfs.Configuration;
-import com.google.jimfs.Jimfs;
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import com.google.testing.results.TestResultsProto.TestResults;
 import com.google.testing.results.TestSuiteProto.TestSuite;
-import com.google.testing.results.DirectoryBasedOutputsCollector;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -72,7 +72,7 @@ public class AntXmlParserTest {
             .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
             .setName("shouldMatchSingleConstructor"))
         .build();
-    assertThat(actual).has().exactly(testSuite);
+    assertThat(actual).containsExactly(testSuite);
   }
 
   @Test
@@ -97,7 +97,7 @@ public class AntXmlParserTest {
             .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
             .setName("shouldMatchSingleConstructor"))
         .build();
-    assertThat(actual).has().exactly(testSuite);
+    assertThat(actual).containsExactly(testSuite);
   }
 
   @Test
@@ -121,14 +121,14 @@ public class AntXmlParserTest {
             .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
             .setName("shouldMatchSingleConstructor"))
         .build();
-    assertThat(actual).has().exactly(testSuite, getExpectedFailTestSuite());
+    assertThat(actual).containsExactly(testSuite, getExpectedFailTestSuite());
   }
 
   @Test
   public void shouldParseTestFailure() throws Exception {
     List<TestSuite> actual =
         parser.parse(getClass().getResourceAsStream("/fail.xml"), UTF_8);
-    assertThat(actual).has().exactly(getExpectedFailTestSuite());
+    assertThat(actual).containsExactly(getExpectedFailTestSuite());
   }
 
   private TestSuite getExpectedFailTestSuite() {
@@ -243,7 +243,7 @@ public class AntXmlParserTest {
                     47))
                 .addStackContent(text(")\n"))))
         .build();
-    assertThat(actual).has().exactly(testSuite);
+    assertThat(actual).containsExactly(testSuite);
   }
 
   @Test
@@ -300,7 +300,7 @@ public class AntXmlParserTest {
             .setName("testDivision")
             .setError(expectedError))
         .build();
-    assertThat(actual).has().exactly(expected);
+    assertThat(actual).containsExactly(expected);
   }
 
   @Ignore("Guice stack lines start with 2 spaces rather than tab, which we don't handle yet")
@@ -388,7 +388,7 @@ public class AntXmlParserTest {
             .setName("testGuiceException")
             .setError(expectedError))
         .build();
-    assertThat(actual).has().exactly(testSuite);
+    assertThat(actual).containsExactly(testSuite);
   }
 
   @Test
@@ -421,7 +421,7 @@ public class AntXmlParserTest {
                     47))
                 .addStackContent(text(")\n"))))
         .build();
-    assertThat(actual).has().exactly(testSuite);
+    assertThat(actual).containsExactly(testSuite);
   }
 
   private StackContent codeRef(String text, String path, int lineNumber) {
@@ -454,7 +454,7 @@ public class AntXmlParserTest {
             .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
             .setName("shouldMatchSingleConstructor"))
         .build();
-    assertThat(actual).has().exactly(testSuite);
+    assertThat(actual).containsExactly(testSuite);
   }
 
   @Test
@@ -528,6 +528,6 @@ public class AntXmlParserTest {
                     25))
                 .addStackContent(text(")\n"))))
         .build();
-    assertThat(actual).has().exactly(testSuite);
+    assertThat(actual).containsExactly(testSuite);
   }
 }

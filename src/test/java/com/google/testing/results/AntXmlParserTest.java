@@ -530,4 +530,65 @@ public class AntXmlParserTest {
         .build();
     assertThat(actual).containsExactly(testSuite);
   }
+
+  @Test
+  public void shouldParseStackTraceWithLink() throws Exception {
+    List<TestSuite> actual =
+        parser.parse(getClass().getResourceAsStream("/stack-track-with-link.xml"), UTF_8);
+    StackTrace.Builder expectedFailure =
+        StackTrace.newBuilder()
+            .setContent(
+                "Not true that <null> is equal to <\"null\">\n"
+                    + "\tat com.google.example.SomeTest.testCase(SomeTest.kt:33)\n"
+                    + "\tat [[Reflective call: 2 frames collapsed (https://goo.gl/aH3UyP)]].(:0)\n"
+                    + "\tat [[Testing framework: 31 frames collapsed (https://goo.gl/aH3UyP)]].(:0)\n"
+                    + "\tat android.support.test.internal.runner.TestExecutor.execute(TestExecutor.java:58)\n"
+                    + "\tat android.support.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:375)\n"
+                    + "\tat android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:1853)\n")
+            .addStackContent(
+                text(
+                    "Not true that <null> is equal to <\"null\">\n"
+                        + "\tat com.google.example.SomeTest.testCase("))
+            .addStackContent(codeRef("SomeTest.kt:33", "com/google/example/SomeTest.kt", 33))
+            .addStackContent(
+                text(
+                    ")\n"
+                        + "\tat [[Reflective call: 2 frames collapsed (https://goo.gl/aH3UyP)]].(:0)\n"
+                        + "\tat [[Testing framework: 31 frames collapsed (https://goo.gl/aH3UyP)]].(:0)\n"
+                        + "\tat android.support.test.internal.runner.TestExecutor.execute("))
+            .addStackContent(
+                codeRef(
+                    "TestExecutor.java:58",
+                    "android/support/test/internal/runner/TestExecutor.java",
+                    58))
+            .addStackContent(
+                text(")\n\tat android.support.test.runner.AndroidJUnitRunner.onStart("))
+            .addStackContent(
+                codeRef(
+                    "AndroidJUnitRunner.java:375",
+                    "android/support/test/runner/AndroidJUnitRunner.java",
+                    375))
+            .addStackContent(
+                text(")\n\tat android.app.Instrumentation$InstrumentationThread.run("))
+            .addStackContent(
+                codeRef("Instrumentation.java:1853", "android/app/Instrumentation.java", 1853))
+            .addStackContent(text(")\n"));
+    TestSuite expected =
+        TestSuite.newBuilder()
+            .setName("")
+            .setTotalCount(1)
+            .setFailureCount(1)
+            .setErrorCount(0)
+            .setSkippedCount(0)
+            .setElapsedTimeMillis(65)
+            .addTestCase(
+                TestCase.newBuilder()
+                    .setElapsedTimeMillis(0)
+                    .setStatus(TestStatus.FAILED)
+                    .setClassName("com.google.example.SomeTest")
+                    .addFailure(expectedFailure)
+                    .setName("testCase"))
+            .build();
+    assertThat(actual.get(0)).isEqualTo(expected);
+  }
 }

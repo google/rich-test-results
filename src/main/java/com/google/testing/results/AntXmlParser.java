@@ -347,8 +347,8 @@ public class AntXmlParser {
       StackTrace.Builder stackTraceBuilder, StringBuilder textBuilder, String line)
       throws XMLStreamException {
     try {
-      int openParen = line.indexOf('(');
-      int closeParen = line.indexOf(')');
+      int openParen = line.lastIndexOf('(');
+      int closeParen = line.lastIndexOf(')');
       if (!line.startsWith(JAVA_STACK_FRAME_PREFIX) || openParen < 0 || closeParen < 0) {
         textBuilder.append(line).append("\n");
         return;

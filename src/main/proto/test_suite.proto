@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+syntax = "proto2";
 
 option java_package = "com.google.testing.results";
 option java_outer_classname = "TestSuiteProto";
@@ -44,6 +45,8 @@ message Property {
 message TestCase {
     optional string class_name = 1;
     optional string name = 2;
+    optional double start_timestamp = 9;
+    optional double end_timestamp = 10;
     optional int64 elapsed_time_millis = 3;
     repeated Property unrecognized_attributes = 4;
 

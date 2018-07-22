@@ -76,6 +76,40 @@ public class AntXmlParserTest {
   }
 
   @Test
+  public void shouldParseTestCaseTime() throws Exception {
+    final double startTimestamp = 1498079648.291;
+    final double endTimestamp = 1498079648.917;
+    List<TestSuite> actual = parser.parse(
+        getClass().getResourceAsStream("/simple_with_test_case_time.xml"), UTF_8);
+    TestSuite testSuite = TestSuite.newBuilder()
+        .setName("com.google.errorprone.matchers.ConstructorOfClassTest")
+        .setTotalCount(8)
+        .setFailureCount(1)
+        .setErrorCount(2)
+        .setSkippedCount(4)
+        .setElapsedTimeMillis(68L)
+        .addProperty(Property.newBuilder()
+            .setName("java.runtime.name").setValue("Java(TM) SE Runtime Environment"))
+        .addProperty(Property.newBuilder()
+            .setName("sun.cpu.isalist").setValue(""))
+        .addTestCase(TestCase.newBuilder()
+            .setElapsedTimeMillis(17L)
+            .setStartTimestamp(startTimestamp)
+            .setEndTimestamp(endTimestamp)
+            .setStatus(TestStatus.PASSED)
+            .setClassName("com.google.errorprone.matchers.ConstructorOfClassTest")
+            .setName("shouldMatchSingleConstructor"))
+        .build();
+    assertThat(testSuite.getTestCase(0).getStartTimestamp())
+        .isWithin(0.0)
+        .of(startTimestamp);
+    assertThat(testSuite.getTestCase(0).getEndTimestamp())
+        .isWithin(0.0)
+        .of(endTimestamp);
+    assertThat(actual).containsExactly(testSuite);
+  }
+
+  @Test
   public void shouldParseSkippedTest() throws Exception {
     List<TestSuite> actual = parser.parse(
         getClass().getResourceAsStream("/skipped.xml"), UTF_8);

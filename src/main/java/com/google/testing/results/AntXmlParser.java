@@ -238,6 +238,12 @@ public class AntXmlParser {
         case "time":
           builder.setElapsedTimeMillis((long) (Float.parseFloat(attributeValue) * 1000));
           break;
+        case "start-time":
+          builder.setStartTimestamp(Double.parseDouble(attributeValue));
+          break;
+        case "end-time":
+          builder.setEndTimestamp(Double.parseDouble(attributeValue));
+          break;
       }
     }
 

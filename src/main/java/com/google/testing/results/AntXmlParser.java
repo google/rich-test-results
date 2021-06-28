@@ -356,7 +356,7 @@ public class AntXmlParser {
 
       String fileAndLine = line.substring(openParen + 1, closeParen);
       int colon = fileAndLine.indexOf(':');
-      if (colon <= 0) {
+      if (colon <= 0 || colon != fileAndLine.lastIndexOf(':')) {
         textBuilder.append(line).append("\n");
         return;
       }
@@ -375,7 +375,13 @@ public class AntXmlParser {
         path = filename;
       }
 
-      int lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
+      int lineNumber;
+      try {
+        lineNumber = Integer.parseInt(fileAndLine.substring(colon + 1));
+      } catch (NumberFormatException e) {
+        textBuilder.append(line).append("\n");
+        return;
+      }
 
       textBuilder.append(line.substring(0, openParen + 1));
       if (textBuilder.length() > 0) {

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="" tests="1" failures="1" errors="0" skipped="0" time="0.065" timestamp="2018-03-02T11:29:30" hostname="localhost">
+  <properties />
+  <testcase name="testCase" classname="com.google.example.SomeTest" time="0.0">
+    <failure>Not true that &lt;null&gt; is equal to &lt;"null"&gt;
+	at com.google.example.SomeTest.testCase(SomeTest.kt:33)
+	at a.b.c(com.example.app:example-auth@@13.0.1:55)
+	at u.v.w$a.a(com.google.android.gms:play-services-base@@17.5.0:47)
+</failure>
+  </testcase>
+</testsuite>

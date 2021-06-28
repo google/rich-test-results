@@ -43,7 +43,9 @@ import java.util.List;
  */
 @RunWith(JUnit4.class)
 public class AntXmlParserTest {
-  @Rule public ExpectedException thrown = ExpectedException.none();
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
   AntXmlParser parser;
 
   @Before
@@ -587,6 +589,45 @@ public class AntXmlParserTest {
                     .setStatus(TestStatus.FAILED)
                     .setClassName("com.google.example.SomeTest")
                     .addFailure(expectedFailure)
+                    .setName("testCase"))
+            .build();
+    assertThat(actual.get(0)).isEqualTo(expected);
+  }
+
+  @Test
+  public void shouldNotCrashWithMavenArtifactInsteadOfClassName() throws Exception {
+    List<TestSuite> actual =
+        parser.parse(getClass().getResourceAsStream("/stack-with-artifact-lines.xml"), UTF_8);
+    TestSuite expected =
+        TestSuite.newBuilder()
+            .setName("")
+            .setTotalCount(1)
+            .setFailureCount(1)
+            .setErrorCount(0)
+            .setSkippedCount(0)
+            .setElapsedTimeMillis(65)
+            .addTestCase(
+                TestCase.newBuilder()
+                    .setElapsedTimeMillis(0)
+                    .setStatus(TestStatus.FAILED)
+                    .setClassName("com.google.example.SomeTest")
+                    .addFailure(StackTrace.newBuilder()
+                        .setContent("Not true that <null> is equal to <\"null\">\n"
+                            + "\tat com.google.example.SomeTest.testCase(SomeTest.kt:33)\n"
+                            + "\tat a.b.c(com.example.app:example-auth@@13.0.1:55)\n"
+                            + "\tat u.v.w$a.a(com.google.android.gms:play-services-base@@17.5.0:47)\n")
+                        .addStackContent(
+                            text(
+                                "Not true that <null> is equal to <\"null\">\n"
+                                    + "\tat com.google.example.SomeTest.testCase("))
+                        .addStackContent(
+                            codeRef("SomeTest.kt:33", "com/google/example/SomeTest.kt", 33))
+                        .addStackContent(text(
+                            ")\n"
+                                + "\tat a.b.c(com.example.app:example-auth@@13.0.1:55)\n"
+                                + "\tat u.v.w$a.a(com.google.android.gms:play-services-base@@17.5.0:47)\n"
+                        ))
+                        .build())
                     .setName("testCase"))
             .build();
     assertThat(actual.get(0)).isEqualTo(expected);
